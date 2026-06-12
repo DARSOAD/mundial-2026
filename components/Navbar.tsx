@@ -16,7 +16,7 @@ export default async function Navbar() {
             <span className="text-lg">🇨🇴</span>
           </Link>
           
-          <div className="flex gap-4 text-xs font-bold uppercase tracking-wider text-slate-400 items-center">
+          <div className="flex gap-4 text-xs font-bold uppercase tracking-wider text-slate-400 items-center overflow-x-auto whitespace-nowrap scrollbar-hide py-2 max-w-[60vw] md:max-w-none">
             <Link href="/" className="hover:text-yellow-500 transition-colors">Home</Link>
             <Link href="/leaderboard" className="hover:text-yellow-500 transition-colors">Ranking</Link>
             <Link href="/calendar" className="hover:text-yellow-500 transition-colors">Calendario</Link>
