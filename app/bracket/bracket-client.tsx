@@ -33,94 +33,165 @@ export default function BracketClient({ user, knockoutMatches, activePhases }: {
     setIsSaving(false);
   };
 
-  // Agrupamos los partidos por fase para renderizarlos en columnas
-  const phasesOrder = ["16VOS", "OCTAVOS", "CUARTOS", "SEMIS", "FINAL"];
+  // Helper para renderizar un partido en el bracket
+  const renderMatch = (m: any, phaseId: string) => {
+    if (!m) return <div className="w-[200px] h-[80px] bg-white/5 border border-white/5 rounded-xl opacity-20 flex items-center justify-center text-[10px] text-white/30 uppercase tracking-widest">Por Definir</div>;
+
+    const isPhaseActive = activePhases.includes(phaseId);
+    const matchPred = preds[m.id] || { goles_local: null, goles_visitante: null };
+
+    return (
+      <div className={`w-[220px] p-3 rounded-xl border relative z-10 transition-all ${isPhaseActive ? 'bg-[#16191f] border-white/20 shadow-lg shadow-black/50 hover:border-yellow-500/50' : 'bg-[#0f1115] border-white/5 opacity-60'}`}>
+        <p className="text-[7px] font-black uppercase text-yellow-500 tracking-wider text-center mb-2">
+          {m.date}
+        </p>
+        <div className="flex flex-col gap-1">
+          {/* LOCAL */}
+          <div className="flex items-center justify-between bg-black/40 rounded px-2 py-1">
+            <div className="flex items-center gap-2 overflow-hidden">
+              <span className="text-lg">{getFlag(m.local)}</span>
+              <span className="text-[10px] font-bold uppercase truncate">{m.local}</span>
+            </div>
+            <input 
+              type="number" min="0"
+              value={matchPred.goles_local ?? ""}
+              disabled={!isPhaseActive}
+              onChange={(e) => handleMatchChange(m.id, 'goles_local', e.target.value)}
+              className={`w-8 h-6 text-center font-black text-xs rounded outline-none border ${!isPhaseActive ? 'bg-transparent border-transparent text-white/50' : 'bg-[#1a1d24] border-white/10 focus:border-yellow-500 text-yellow-500'}`}
+            />
+          </div>
+          {/* VISITANTE */}
+          <div className="flex items-center justify-between bg-black/40 rounded px-2 py-1">
+            <div className="flex items-center gap-2 overflow-hidden">
+              <span className="text-lg">{getFlag(m.visitante)}</span>
+              <span className="text-[10px] font-bold uppercase truncate">{m.visitante}</span>
+            </div>
+            <input 
+              type="number" min="0"
+              value={matchPred.goles_visitante ?? ""}
+              disabled={!isPhaseActive}
+              onChange={(e) => handleMatchChange(m.id, 'goles_visitante', e.target.value)}
+              className={`w-8 h-6 text-center font-black text-xs rounded outline-none border ${!isPhaseActive ? 'bg-transparent border-transparent text-white/50' : 'bg-[#1a1d24] border-white/10 focus:border-yellow-500 text-yellow-500'}`}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Separamos los partidos por fase (esto asume que eventualmente todos estarán en knockoutMatches)
+  const getPhaseMatches = (group: string) => knockoutMatches.filter(m => m.group === group);
   
+  const m16 = getPhaseMatches("16VOS");
+  const moct = getPhaseMatches("OCTAVOS");
+  const mcua = getPhaseMatches("CUARTOS");
+  const msem = getPhaseMatches("SEMIS");
+  const mfin = getPhaseMatches("FINAL");
+  
+  // Para la UI, crearemos arreglos fijos para pintar el árbol completo vacío si faltan
+  const createPaddedArray = (matches: any[], size: number) => {
+    const arr = [...matches];
+    while(arr.length < size) arr.push(null);
+    return arr;
+  }
+
+  const p16 = createPaddedArray(m16, 16);
+  const poct = createPaddedArray(moct, 8);
+  const pcua = createPaddedArray(mcua, 4);
+  const psem = createPaddedArray(msem, 2);
+
   return (
-    <div className="flex flex-col">
-      {/* BOTON MAESTRO GUARDAR */}
-      <div className="flex justify-end mb-8 sticky top-20 z-50">
+    <div className="flex flex-col relative min-h-screen">
+      
+      {/* HEADER FLOTANTE CON BOTÓN */}
+      <div className="sticky top-16 z-50 bg-gradient-to-b from-[#0f1115] to-transparent pt-4 pb-8 mb-4 flex justify-between items-center px-4">
+        <div>
+           <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Aviso: Llena solo las fases iluminadas</p>
+        </div>
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-yellow-500 hover:bg-yellow-400 text-black font-black px-10 py-4 rounded-2xl uppercase tracking-widest text-sm transition-all disabled:opacity-50 shadow-2xl shadow-yellow-500/30 flex items-center gap-2"
+          className="bg-yellow-500 hover:bg-yellow-400 text-black font-black px-8 py-3 rounded-full uppercase tracking-widest text-xs transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(234,179,8,0.3)]"
         >
-          {isSaving ? "Guardando..." : "💾 Guardar Predicciones"}
+          {isSaving ? "Guardando..." : "💾 Guardar Pronósticos"}
         </button>
       </div>
 
-      {/* RENDERIZADO DEL BRACKET (Columnas Flex) */}
-      <div className="flex flex-col md:flex-row gap-8 overflow-x-auto pb-10">
-        {phasesOrder.map(phaseName => {
-          const matchesInPhase = knockoutMatches.filter(m => m.group === phaseName);
+      {/* CONTENEDOR DEL ÁRBOL (SCROLL HORIZONTAL) */}
+      <div className="overflow-x-auto pb-20 px-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <div className="min-w-[1200px] flex justify-between items-center gap-4 relative">
           
-          if (matchesInPhase.length === 0) return null; // No mostrar columna si no hay partidos
-
-          // Convertir "16VOS" a "16vos" para comparar con activePhases
-          const phaseId = phaseName.toLowerCase();
-          const isPhaseActive = activePhases.includes(phaseId);
-
-          return (
-            <div key={phaseName} className="flex-1 min-w-[300px] flex flex-col gap-4">
-              <div className={`p-4 rounded-2xl text-center border-b-4 ${isPhaseActive ? 'bg-yellow-500/10 border-yellow-500' : 'bg-white/5 border-white/10 opacity-50'}`}>
-                <h3 className={`font-black uppercase tracking-widest ${isPhaseActive ? 'text-yellow-500' : 'text-white/40'}`}>
-                  {phaseName}
-                </h3>
-                <p className="text-[9px] uppercase font-bold text-white/30 mt-1">
-                  {isPhaseActive ? 'Abierto para predicción' : 'Fase Bloqueada'}
-                </p>
-              </div>
-
-              {matchesInPhase.map(m => {
-                const matchPred = preds[m.id] || { goles_local: null, goles_visitante: null };
-                
-                return (
-                  <div key={m.id} className={`p-5 rounded-2xl border transition-all ${isPhaseActive ? 'bg-[#16191f] border-white/10 hover:border-yellow-500/50' : 'bg-[#0f1115] border-white/5 opacity-40 grayscale'}`}>
-                    <p className="text-[8px] font-black uppercase text-yellow-500 tracking-wider text-center mb-3">
-                      {m.date} • {m.time}
-                    </p>
-                    
-                    <div className="flex items-center justify-between gap-4">
-                      {/* LOCAL */}
-                      <div className="flex flex-col items-center flex-1">
-                        <span className="text-2xl mb-1">{getFlag(m.local)}</span>
-                        <span className="text-[10px] font-bold uppercase text-center leading-none text-white/80 h-6">
-                          {m.local}
-                        </span>
-                        <input 
-                          type="number" min="0"
-                          value={matchPred.goles_local ?? ""}
-                          disabled={!isPhaseActive}
-                          onChange={(e) => handleMatchChange(m.id, 'goles_local', e.target.value)}
-                          className={`w-12 h-10 mt-2 text-center font-black text-lg rounded-lg outline-none border ${!isPhaseActive ? 'bg-transparent border-transparent text-white/50 cursor-not-allowed' : 'bg-black/50 border-white/10 focus:border-yellow-500 focus:bg-yellow-500/10 text-white'}`}
-                          placeholder="-"
-                        />
-                      </div>
-
-                      <span className="font-black text-white/20 text-xs italic">VS</span>
-
-                      {/* VISITANTE */}
-                      <div className="flex flex-col items-center flex-1">
-                        <span className="text-2xl mb-1">{getFlag(m.visitante)}</span>
-                        <span className="text-[10px] font-bold uppercase text-center leading-none text-white/80 h-6">
-                          {m.visitante}
-                        </span>
-                        <input 
-                          type="number" min="0"
-                          value={matchPred.goles_visitante ?? ""}
-                          disabled={!isPhaseActive}
-                          onChange={(e) => handleMatchChange(m.id, 'goles_visitante', e.target.value)}
-                          className={`w-12 h-10 mt-2 text-center font-black text-lg rounded-lg outline-none border ${!isPhaseActive ? 'bg-transparent border-transparent text-white/50 cursor-not-allowed' : 'bg-black/50 border-white/10 focus:border-yellow-500 focus:bg-yellow-500/10 text-white'}`}
-                          placeholder="-"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+          {/* ================= RAMA IZQUIERDA ================= */}
+          <div className="flex gap-4">
+            {/* 16vos Izquierda (8 partidos) */}
+            <div className="flex flex-col gap-4 justify-around py-4">
+              <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">16vos</h4>
+              {p16.slice(0,8).map((m, i) => <div key={i} className="my-1">{renderMatch(m, "16vos")}</div>)}
             </div>
-          );
-        })}
+            
+            {/* Octavos Izquierda (4 partidos) */}
+            <div className="flex flex-col gap-4 justify-around py-16">
+              <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Octavos</h4>
+              {poct.slice(0,4).map((m, i) => <div key={i} className="my-6">{renderMatch(m, "octavos")}</div>)}
+            </div>
+
+            {/* Cuartos Izquierda (2 partidos) */}
+            <div className="flex flex-col gap-4 justify-around py-32">
+              <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Cuartos</h4>
+              {pcua.slice(0,2).map((m, i) => <div key={i} className="my-12">{renderMatch(m, "cuartos")}</div>)}
+            </div>
+
+            {/* Semis Izquierda (1 partido) */}
+            <div className="flex flex-col justify-center">
+              <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Semifinal</h4>
+              <div className="my-auto">{renderMatch(psem[0], "semis")}</div>
+            </div>
+          </div>
+
+
+          {/* ================= CENTRO (FINAL Y 3ER PUESTO) ================= */}
+          <div className="flex flex-col items-center justify-center gap-12 px-8 min-w-[300px]">
+            <div className="flex flex-col items-center">
+              <span className="text-4xl mb-2">🏆</span>
+              <h3 className="text-xl font-black uppercase font-montserrat text-yellow-500 mb-4 tracking-tighter">Gran Final</h3>
+              {renderMatch(mfin[0] || null, "final")}
+            </div>
+
+            <div className="flex flex-col items-center mt-12 opacity-80 scale-90">
+              <h3 className="text-sm font-black uppercase text-slate-400 mb-4 tracking-widest">3er Puesto</h3>
+              {renderMatch(mfin[1] || null, "final")}
+            </div>
+          </div>
+
+
+          {/* ================= RAMA DERECHA ================= */}
+          <div className="flex gap-4 flex-row-reverse">
+            {/* 16vos Derecha (8 partidos) */}
+            <div className="flex flex-col gap-4 justify-around py-4">
+              <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">16vos</h4>
+              {p16.slice(8,16).map((m, i) => <div key={i} className="my-1">{renderMatch(m, "16vos")}</div>)}
+            </div>
+            
+            {/* Octavos Derecha (4 partidos) */}
+            <div className="flex flex-col gap-4 justify-around py-16">
+              <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Octavos</h4>
+              {poct.slice(4,8).map((m, i) => <div key={i} className="my-6">{renderMatch(m, "octavos")}</div>)}
+            </div>
+
+            {/* Cuartos Derecha (2 partidos) */}
+            <div className="flex flex-col gap-4 justify-around py-32">
+              <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Cuartos</h4>
+              {pcua.slice(2,4).map((m, i) => <div key={i} className="my-12">{renderMatch(m, "cuartos")}</div>)}
+            </div>
+
+            {/* Semis Derecha (1 partido) */}
+            <div className="flex flex-col justify-center">
+              <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Semifinal</h4>
+              <div className="my-auto">{renderMatch(psem[1], "semis")}</div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );
