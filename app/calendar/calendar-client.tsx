@@ -39,11 +39,11 @@ export default function CalendarClient({ participants, matches, results, current
         <table className="w-full text-left border-collapse min-w-0">
           <thead>
             <tr className="bg-white/5">
-              <th className="px-3 py-2 md:p-6 text-[10px] md:text-xs font-black uppercase tracking-widest text-white/40 sticky left-0 bg-[#0f1115] z-20 border-r border-white/5 w-auto">Partido</th>
-              <th className="px-2 py-2 md:p-6 text-[10px] md:text-xs font-black uppercase tracking-widest text-white/40 text-center border-r border-white/5 w-10 md:w-auto">Real</th>
+              <th className="px-3 py-3 md:p-6 text-[11px] md:text-xs font-black uppercase tracking-widest text-white/40 sticky left-0 bg-[#0f1115] z-20 border-r border-white/5 w-auto">Partido</th>
+              <th className="px-2 py-3 md:p-6 text-[11px] md:text-xs font-black uppercase tracking-widest text-white/40 text-center border-r border-white/5 w-12 md:w-auto">Real</th>
               {filteredParticipants.map((p: any) => (
-                <th key={p.userId} className="px-1 py-2 md:p-6 text-[8px] md:text-xs font-black uppercase tracking-widest text-yellow-500 text-center w-12 md:min-w-[150px]">
-                  {p.name.substring(0, 8)}
+                <th key={p.userId} className="px-2 py-3 md:p-6 text-[11px] md:text-xs font-black uppercase tracking-widest text-yellow-500 text-center min-w-[70px] md:min-w-[150px]">
+                  {p.name.substring(0, 10)}
                 </th>
               ))}
             </tr>
@@ -53,20 +53,20 @@ export default function CalendarClient({ participants, matches, results, current
               const res = results[m.id];
               return (
                 <tr key={m.id} className="hover:bg-white/[0.02] transition-colors group">
-                  <td className="px-3 py-2 md:p-4 sticky left-0 bg-[#0f1115] z-10 border-r border-white/5 group-hover:bg-white/[0.05]">
-                    <div className="flex flex-col gap-1">
+                  <td className="px-3 py-3 md:p-4 sticky left-0 bg-[#0f1115] z-10 border-r border-white/5 group-hover:bg-white/[0.05]">
+                    <div className="flex flex-col gap-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm md:text-xl leading-none">{getFlag(m.local)}</span>
-                        <span className="font-bold text-[9px] md:text-xs uppercase tracking-tighter whitespace-nowrap leading-none">{m.local}</span>
+                        <span className="text-lg md:text-xl leading-none">{getFlag(m.local)}</span>
+                        <span className="font-bold text-[11px] md:text-xs uppercase tracking-tighter whitespace-nowrap leading-none">{m.local}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm md:text-xl leading-none">{getFlag(m.visitante)}</span>
-                        <span className="font-bold text-[9px] md:text-xs uppercase tracking-tighter whitespace-nowrap leading-none text-white/60">{m.visitante}</span>
+                        <span className="text-lg md:text-xl leading-none">{getFlag(m.visitante)}</span>
+                        <span className="font-bold text-[11px] md:text-xs uppercase tracking-tighter whitespace-nowrap leading-none text-white/60">{m.visitante}</span>
                       </div>
-                      <span className="text-[7px] md:text-[9px] font-black uppercase text-yellow-500 tracking-[0.2em] mt-1">{m.date.split('-').slice(1).join('/')} • {m.time}</span>
+                      <span className="text-[9px] md:text-[9px] font-black uppercase text-yellow-500 tracking-[0.1em] mt-1">{m.date.split('-').slice(1).join('/')} • {m.time}</span>
                     </div>
                   </td>
-                  <td className="px-2 py-2 md:p-6 text-center font-black text-[10px] md:text-base font-montserrat border-r border-white/5 bg-white/5">
+                  <td className="px-2 py-3 md:p-6 text-center font-black text-sm md:text-base font-montserrat border-r border-white/5 bg-white/5">
                     {res ? `${res.home}-${res.away}` : '-'}
                   </td>
                   {filteredParticipants.map((p: any) => {
@@ -74,7 +74,7 @@ export default function CalendarClient({ participants, matches, results, current
                     const isExact = res && pred && pred.goles_local === res.home && pred.goles_visitante === res.away;
                     
                     return (
-                      <td key={p.userId} className={`px-1 py-2 md:p-6 text-center font-bold text-xs md:text-base transition-all ${isExact ? 'bg-yellow-500/10 text-yellow-500 scale-[0.98]' : 'text-white/40'}`}>
+                      <td key={p.userId} className={`px-2 py-3 md:p-6 text-center font-bold text-sm md:text-base transition-all ${isExact ? 'bg-yellow-500/10 text-yellow-500 scale-[0.98]' : 'text-white/40'}`}>
                         {pred?.goles_local ?? '-'}:{pred?.goles_visitante ?? '-'}
                       </td>
                     );
