@@ -25,15 +25,10 @@ export default function HomePage() {
     load();
   }, []);
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-yellow-500 uppercase tracking-widest animate-pulse">Cargando Mundial...</div>;
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-yellow-500 uppercase tracking-widest animate-pulse text-center p-4">Cargando Mundial 2026...</div>;
 
   const participants = data.participants || [];
-  
-  // Simulación de resultados reales (Esto vendrá en el futuro de la API)
-  const realResults: Record<string, MatchResult> = {
-    "mex_saf": { homeGoals: 2, awayGoals: 0, status: 'finished' },
-    "sko_rch": { homeGoals: 2, awayGoals: 1, status: 'finished' }
-  };
+  const realResults = data.realResults || {}; // ¡AHORA LEEMOS DEL SNAPSHOT REAL!
 
   const processedParticipants = participants.map((p: any) => {
     const breakdown = {
@@ -58,13 +53,14 @@ export default function HomePage() {
   });
 
   const sortedParticipants = [...processedParticipants].sort((a, b) => b.breakdown.totalPoints - a.breakdown.totalPoints);
+  
+  // El próximo partido es el primero que NO tiene resultados en el snapshot
   const nextMatch = matches.find(m => !realResults[m.id]) || matches[0];
 
   return (
     <div className="max-w-[1400px] mx-auto py-8 px-4">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* COLUMNA IZQUIERDA: LEADERBOARD */}
+        {/* COLUMNA IZQUIERDA: RANKING */}
         <div className="order-2 lg:order-1 lg:col-span-5 flex flex-col gap-6">
           <div className="bg-white/5 border border-yellow-500/20 rounded-[2.5rem] overflow-hidden backdrop-blur-sm shadow-2xl">
             <div className="bg-gradient-to-r from-yellow-600/20 to-transparent px-8 py-6 border-b border-white/5">
@@ -72,26 +68,22 @@ export default function HomePage() {
                 <span className="text-yellow-500">🏆</span> Ranking <span className="text-white">Familiar</span>
               </h2>
             </div>
-            
             <div className="divide-y divide-white/5">
-              {sortedParticipants.map((p: any, index) => (
+              {sortedParticipants.length > 0 ? sortedParticipants.map((p: any, index) => (
                 <div key={p.userId} className={`px-8 py-6 transition-all ${index === 0 ? 'bg-yellow-500/5' : ''}`}>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4">
                       <span className={`text-2xl font-black font-montserrat w-8 ${index === 0 ? 'text-yellow-500' : index === 1 ? 'text-slate-300' : index === 2 ? 'text-amber-700' : 'text-white/20'}`}>
-                        {index + 1}
+                        #{index + 1}
                       </span>
                       <p className="font-black text-xl tracking-tight text-white">{p.name}</p>
                     </div>
                     <div className="text-right">
-                      <span className={`text-4xl font-black font-montserrat ${index === 0 ? 'text-yellow-500' : 'text-white'}`}>
-                        {p.breakdown.totalPoints}
-                      </span>
+                      <span className={`text-4xl font-black font-montserrat ${index === 0 ? 'text-yellow-500' : 'text-white'}`}>{p.breakdown.totalPoints}</span>
                       <span className="text-[10px] ml-1 font-black text-white/40 uppercase">pts</span>
                     </div>
                   </div>
-
-                  <div className="flex gap-2 mt-2">
+                  <div className="flex gap-2">
                     <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 border border-white/5">
                       <span className="text-yellow-500 text-xs font-black">{p.breakdown.exactColombia}</span>
                       <span className="text-[8px] font-black uppercase text-white/30">🇨🇴</span>
@@ -110,13 +102,10 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              )) : <p className="p-8 text-center text-white/20 font-bold uppercase tracking-widest text-xs">Esperando migración de datos...</p>}
             </div>
           </div>
-          
-          <Link href="/calendar" className="bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-2xl text-center uppercase tracking-widest text-xs transition-all shadow-lg shadow-red-600/20">
-            Ver Calendario Completo
-          </Link>
+          <Link href="/calendar" className="bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-2xl text-center uppercase tracking-widest text-xs transition-all shadow-lg shadow-red-600/20">Ver Calendario Completo</Link>
         </div>
 
         {/* COLUMNA DERECHA: PARTIDOS */}
@@ -133,46 +122,33 @@ export default function HomePage() {
                   </div>
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 flex flex-col items-center gap-4">
-                      <img src={getFlag(nextMatch.local)} alt={nextMatch.local} className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-full border-4 border-yellow-500/50 shadow-2xl shadow-yellow-500/20 bg-black/40" />
+                      <img src={getFlag(nextMatch.local)} alt={nextMatch.local} className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-full border-4 border-yellow-500/50 shadow-2xl bg-black/40" />
                       <p className="font-black text-xl uppercase font-montserrat text-center leading-none text-white">{nextMatch.local}</p>
                     </div>
-                    <div className="flex flex-col items-center">
-                      <div className="bg-white/5 border border-white/10 px-6 py-2 rounded-2xl font-black text-2xl italic text-white">VS</div>
-                    </div>
+                    <div className="flex flex-col items-center"><div className="bg-white/5 border border-white/10 px-6 py-2 rounded-2xl font-black text-2xl italic text-white text-center">VS<span className="block text-[8px] not-italic text-white/30">{nextMatch.group}</span></div></div>
                     <div className="flex-1 flex flex-col items-center gap-4">
                       <img src={getFlag(nextMatch.visitante)} alt={nextMatch.visitante} className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-full border-4 border-white/10 shadow-2xl bg-black/40" />
                       <p className="font-black text-xl uppercase font-montserrat text-center leading-none text-white">{nextMatch.visitante}</p>
                     </div>
                   </div>
                   <div className="mt-10 flex justify-center">
-                    <Link href={`/matches/${nextMatch.id}`} className="bg-white text-black font-black px-8 py-3 rounded-full uppercase tracking-tighter text-sm hover:scale-105 transition-transform">
-                      Ver predicciones
-                    </Link>
+                    <Link href={`/matches/${nextMatch.id}`} className="bg-white text-black font-black px-8 py-3 rounded-full uppercase tracking-tighter text-sm hover:scale-105 transition-transform">Ver predicciones</Link>
                   </div>
                 </div>
               </div>
             </div>
           )}
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {matches.filter(m => m.id !== nextMatch.id).slice(0, 4).map(m => (
-              <Link key={m.id} href={`/matches/${m.id}`} className="bg-white/5 border border-white/5 p-5 rounded-3xl flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer group">
+            {matches.filter(m => !realResults[m.id] && m.id !== nextMatch?.id).slice(0, 4).map(m => (
+              <Link key={m.id} href={`/matches/${m.id}`} className="bg-white/5 border border-white/5 p-5 rounded-3xl flex items-center justify-between hover:bg-white/10 transition-colors group">
                 <div className="flex items-center gap-3">
-                  <img src={getFlag(m.local)} alt={m.local} className="w-10 h-10 object-cover rounded-full border border-white/10 bg-black/40" />
-                  <div className="flex flex-col">
-                    <span className="font-bold text-[10px] uppercase text-white/60 leading-none">{m.local}</span>
-                    <span className="text-[8px] text-white/20 mt-1">{m.date}</span>
-                  </div>
+                  <img src={getFlag(m.local)} className="w-10 h-10 object-cover rounded-full border border-white/10" />
+                  <div className="flex flex-col"><span className="font-bold text-[10px] uppercase text-white/60 leading-none">{m.local}</span><span className="text-[8px] text-white/20 mt-1">{m.date}</span></div>
                 </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-[10px] font-black text-yellow-500 group-hover:scale-110 transition-transform">VS</span>
-                  <span className="text-[8px] text-white/30">{m.time}</span>
-                </div>
+                <div className="flex flex-col items-center"><span className="text-[10px] font-black text-yellow-500 uppercase">{m.time}</span></div>
                 <div className="flex items-center gap-3 text-right">
-                  <div className="flex flex-col items-end">
-                    <span className="font-bold text-[10px] uppercase text-white/60 leading-none">{m.visitante}</span>
-                  </div>
-                  <img src={getFlag(m.visitante)} alt={m.visitante} className="w-10 h-10 object-cover rounded-full border border-white/10 bg-black/40" />
+                  <div className="flex flex-col items-end"><span className="font-bold text-[10px] uppercase text-white/60 leading-none">{m.visitante}</span><span className="text-[8px] text-white/20 mt-1">GRUPO {m.group}</span></div>
+                  <img src={getFlag(m.visitante)} className="w-10 h-10 object-cover rounded-full border border-white/10" />
                 </div>
               </Link>
             ))}
