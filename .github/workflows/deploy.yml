@@ -42,5 +42,5 @@ jobs:
 
       - name: Invalidate CloudFront Cache
         run: |
-          # Invalidamos la caché para que los cambios se reflejen de inmediato, actualizamos la id
+          # Invalidamos la caché para que los cambios se reflejen de inmediato, actualizamos la id ahora si, estabamos poniendo el nombre
           aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} --paths "/*"
