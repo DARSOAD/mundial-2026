@@ -38,7 +38,7 @@ jobs:
       - name: Sync files to S3 bucket
         run: |
           # Sincronizamos la carpeta out a la subcarpeta mundial-2026 en S3
-          aws s3 sync out/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/mundial-2026/ --delete
+          aws s3 sync out/ s3://${{ secrets.AWS_S3_BUCKET_NAME }} --delete
 
       - name: Invalidate CloudFront Cache
         uses: aws-actions/cloudfront-invalidate@v3
