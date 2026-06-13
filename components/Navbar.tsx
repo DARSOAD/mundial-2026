@@ -1,9 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import { getLoggedInUser } from "@/lib/auth";
 import LogoutButton from "./LogoutButton";
+import { useEffect, useState } from "react";
 
-export default async function Navbar() {
-  const user = await getLoggedInUser();
+export default function Navbar() {
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadUser() {
+      const u = await getLoggedInUser();
+      setUser(u);
+    }
+    loadUser();
+  }, []);
 
   return (
     <nav className="border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
@@ -37,10 +48,12 @@ export default async function Navbar() {
               </Link>
             )}
 
-            {/* Link secreto admin */}
-            <Link href="/admin" className="opacity-10 hover:opacity-100 hover:text-red-500 transition-opacity ml-2">
-              ⚙️
-            </Link>
+            {/* Link secreto admin solo para Diego */}
+            {user?.userId === 'diego' && (
+              <Link href="/admin" className="opacity-40 hover:opacity-100 hover:text-red-500 transition-opacity ml-2">
+                ⚙️
+              </Link>
+            )}
           </div>
         </div>
       </div>

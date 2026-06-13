@@ -1,29 +1,41 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { getLoggedInUser } from "@/lib/auth";
 import { getAllMatches } from "@/lib/matches";
-import { getSystemSettings } from "@/lib/data";
-import { redirect } from "next/navigation";
+import { getSnapshotData } from "@/lib/data";
 import BracketClient from "./bracket-client";
 
-export default async function BracketPage() {
-  const user = await getLoggedInUser();
-  
-  if (!user) {
-    redirect("/login");
-  }
+export default function BracketPage() {
+  const [user, setUser] = useState<any>(null);
+  const [knockoutMatches, setKnockoutMatches] = useState<any[]>([]);
+  const [activePhases, setActivePhases] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [allMatches, settings] = await Promise.all([
-    getAllMatches(),
-    getSystemSettings()
-  ]);
+  useEffect(() => {
+    async function load() {
+      const [u, m, snap] = await Promise.all([
+        getLoggedInUser(),
+        getAllMatches(),
+        getSnapshotData()
+      ]);
+      
+      if (!u) {
+        window.location.href = '/mundial-2026/login';
+        return;
+      }
 
-  // Filtrar solo partidos de eliminatoria
-  const knockoutMatches = allMatches.filter(m => 
-    m.group === "16VOS" || 
-    m.group === "OCTAVOS" || 
-    m.group === "CUARTOS" || 
-    m.group === "SEMIS" || 
-    m.group === "FINAL"
-  );
+      const ko = m.filter(match => ["16VOS", "OCTAVOS", "CUARTOS", "SEMIS", "FINAL"].includes(match.group));
+
+      setUser(u);
+      setKnockoutMatches(ko);
+      setActivePhases(snap.settings?.activePhases || ["grupos"]);
+      setIsLoading(false);
+    }
+    load();
+  }, []);
+
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-yellow-500 uppercase tracking-widest animate-pulse">Dibujando Camino a la Gloria...</div>;
 
   return (
     <div className="max-w-6xl mx-auto py-12 px-4">
@@ -37,7 +49,7 @@ export default async function BracketPage() {
       <BracketClient 
         user={user} 
         knockoutMatches={knockoutMatches} 
-        activePhases={settings.activePhases || []} 
+        activePhases={activePhases} 
       />
     </div>
   );

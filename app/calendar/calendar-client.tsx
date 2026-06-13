@@ -21,7 +21,7 @@ export default function CalendarClient({ participants, matches, results, current
         </div>
 
         <div className="flex items-center gap-4 bg-white/5 border border-white/10 p-2 rounded-2xl">
-          <span className="pl-4 text-[10px] font-black uppercase text-white/30">Filtrar Jugador:</span>
+          <span className="pl-4 text-[10px] font-black uppercase text-white/30 whitespace-nowrap">Filtrar Jugador:</span>
           <select 
             className="bg-[#0f1115] text-white text-sm font-bold border-none rounded-xl px-4 py-2 focus:ring-2 focus:ring-yellow-500"
             value={filterUser}
@@ -38,7 +38,7 @@ export default function CalendarClient({ participants, matches, results, current
       <div className="overflow-x-auto rounded-[1rem] md:rounded-[2rem] border border-white/5 shadow-2xl">
         <table className="w-full text-left border-collapse min-w-0">
           <thead>
-            <tr className="bg-white/5">
+            <tr className="bg-white/5 text-white">
               <th className="px-3 py-3 md:p-6 text-[11px] md:text-xs font-black uppercase tracking-widest text-white/40 sticky left-0 bg-[#0f1115] z-20 border-r border-white/5 w-auto">Partido</th>
               <th className="px-2 py-3 md:p-6 text-[11px] md:text-xs font-black uppercase tracking-widest text-white/40 text-center border-r border-white/5 w-12 md:w-auto">Real</th>
               {filteredParticipants.map((p: any) => (
@@ -56,17 +56,17 @@ export default function CalendarClient({ participants, matches, results, current
                   <td className="px-3 py-3 md:p-4 sticky left-0 bg-[#0f1115] z-10 border-r border-white/5 group-hover:bg-white/[0.05]">
                     <div className="flex flex-col gap-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg md:text-xl leading-none">{getFlag(m.local)}</span>
-                        <span className="font-bold text-[11px] md:text-xs uppercase tracking-tighter whitespace-nowrap leading-none">{m.local}</span>
+                        <img src={getFlag(m.local)} alt={m.local} className="w-6 h-6 md:w-8 md:h-8 object-cover rounded-full border border-white/10 bg-black/40" />
+                        <span className="font-bold text-[11px] md:text-xs uppercase tracking-tighter whitespace-nowrap leading-none text-white">{m.local}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-lg md:text-xl leading-none">{getFlag(m.visitante)}</span>
+                        <img src={getFlag(m.visitante)} alt={m.visitante} className="w-6 h-6 md:w-8 md:h-8 object-cover rounded-full border border-white/10 bg-black/40" />
                         <span className="font-bold text-[11px] md:text-xs uppercase tracking-tighter whitespace-nowrap leading-none text-white/60">{m.visitante}</span>
                       </div>
                       <span className="text-[9px] md:text-[9px] font-black uppercase text-yellow-500 tracking-[0.1em] mt-1">{m.date.split('-').slice(1).join('/')} • {m.time}</span>
                     </div>
                   </td>
-                  <td className="px-2 py-3 md:p-6 text-center font-black text-sm md:text-base font-montserrat border-r border-white/5 bg-white/5">
+                  <td className="px-2 py-3 md:p-6 text-center font-black text-sm md:text-base font-montserrat border-r border-white/5 bg-white/5 text-white">
                     {res ? `${res.home}-${res.away}` : '-'}
                   </td>
                   {filteredParticipants.map((p: any) => {

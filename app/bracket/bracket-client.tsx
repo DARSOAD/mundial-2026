@@ -49,8 +49,8 @@ export default function BracketClient({ user, knockoutMatches, activePhases }: {
           {/* LOCAL */}
           <div className="flex items-center justify-between bg-black/40 rounded px-2 py-1">
             <div className="flex items-center gap-2 overflow-hidden">
-              <span className="text-lg">{getFlag(m.local)}</span>
-              <span className="text-[10px] font-bold uppercase truncate">{m.local}</span>
+              <img src={getFlag(m.local)} alt={m.local} className="w-5 h-5 object-cover rounded-full bg-black/20" />
+              <span className="text-[10px] font-bold uppercase truncate text-white">{m.local}</span>
             </div>
             <input 
               type="number" min="0"
@@ -63,8 +63,8 @@ export default function BracketClient({ user, knockoutMatches, activePhases }: {
           {/* VISITANTE */}
           <div className="flex items-center justify-between bg-black/40 rounded px-2 py-1">
             <div className="flex items-center gap-2 overflow-hidden">
-              <span className="text-lg">{getFlag(m.visitante)}</span>
-              <span className="text-[10px] font-bold uppercase truncate">{m.visitante}</span>
+              <img src={getFlag(m.visitante)} alt={m.visitante} className="w-5 h-5 object-cover rounded-full bg-black/20" />
+              <span className="text-[10px] font-bold uppercase truncate text-white">{m.visitante}</span>
             </div>
             <input 
               type="number" min="0"
@@ -79,118 +79,80 @@ export default function BracketClient({ user, knockoutMatches, activePhases }: {
     );
   };
 
-  // Separamos los partidos por fase (esto asume que eventualmente todos estarán en knockoutMatches)
   const getPhaseMatches = (group: string) => knockoutMatches.filter(m => m.group === group);
-  
-  const m16 = getPhaseMatches("16VOS");
-  const moct = getPhaseMatches("OCTAVOS");
-  const mcua = getPhaseMatches("CUARTOS");
-  const msem = getPhaseMatches("SEMIS");
   const mfin = getPhaseMatches("FINAL");
   
-  // Para la UI, crearemos arreglos fijos para pintar el árbol completo vacío si faltan
   const createPaddedArray = (matches: any[], size: number) => {
     const arr = [...matches];
     while(arr.length < size) arr.push(null);
     return arr;
   }
 
-  const p16 = createPaddedArray(m16, 16);
-  const poct = createPaddedArray(moct, 8);
-  const pcua = createPaddedArray(mcua, 4);
-  const psem = createPaddedArray(msem, 2);
+  const p16 = createPaddedArray(getPhaseMatches("16VOS"), 16);
+  const poct = createPaddedArray(getPhaseMatches("OCTAVOS"), 8);
+  const pcua = createPaddedArray(getPhaseMatches("CUARTOS"), 4);
+  const psem = createPaddedArray(getPhaseMatches("SEMIS"), 2);
 
   return (
     <div className="flex flex-col relative min-h-screen">
-      
-      {/* HEADER FLOTANTE CON BOTÓN */}
       <div className="sticky top-16 z-50 bg-gradient-to-b from-[#0f1115] to-transparent pt-4 pb-8 mb-4 flex justify-between items-center px-4">
-        <div>
-           <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Aviso: Llena solo las fases iluminadas</p>
-        </div>
-        <button 
-          onClick={handleSave}
-          disabled={isSaving}
-          className="bg-yellow-500 hover:bg-yellow-400 text-black font-black px-8 py-3 rounded-full uppercase tracking-widest text-xs transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(234,179,8,0.3)]"
-        >
+        <div><p className="text-[10px] text-white/40 uppercase font-black tracking-widest text-white">Llena solo las fases iluminadas</p></div>
+        <button onClick={handleSave} disabled={isSaving} className="bg-yellow-500 hover:bg-yellow-400 text-black font-black px-8 py-3 rounded-full uppercase tracking-widest text-xs transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(234,179,8,0.3)]">
           {isSaving ? "Guardando..." : "💾 Guardar Pronósticos"}
         </button>
       </div>
 
-      {/* CONTENEDOR DEL ÁRBOL (SCROLL HORIZONTAL) */}
-      <div className="overflow-x-auto pb-20 px-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+      <div className="overflow-x-auto pb-20 px-4">
         <div className="min-w-[1200px] flex justify-between items-center gap-4 relative">
-          
-          {/* ================= RAMA IZQUIERDA ================= */}
           <div className="flex gap-4">
-            {/* 16vos Izquierda (8 partidos) */}
             <div className="flex flex-col gap-4 justify-around py-4">
               <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">16vos</h4>
-              {p16.slice(0,8).map((m, i) => <div key={i} className="my-1">{renderMatch(m, "16vos")}</div>)}
+              {p16.slice(0,8).map((m, i) => <div key={i} className="my-1 text-white">{renderMatch(m, "16vos")}</div>)}
             </div>
-            
-            {/* Octavos Izquierda (4 partidos) */}
             <div className="flex flex-col gap-4 justify-around py-16">
               <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Octavos</h4>
-              {poct.slice(0,4).map((m, i) => <div key={i} className="my-6">{renderMatch(m, "octavos")}</div>)}
+              {poct.slice(0,4).map((m, i) => <div key={i} className="my-6 text-white">{renderMatch(m, "octavos")}</div>)}
             </div>
-
-            {/* Cuartos Izquierda (2 partidos) */}
             <div className="flex flex-col gap-4 justify-around py-32">
               <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Cuartos</h4>
-              {pcua.slice(0,2).map((m, i) => <div key={i} className="my-12">{renderMatch(m, "cuartos")}</div>)}
+              {pcua.slice(0,2).map((m, i) => <div key={i} className="my-12 text-white">{renderMatch(m, "cuartos")}</div>)}
             </div>
-
-            {/* Semis Izquierda (1 partido) */}
             <div className="flex flex-col justify-center">
               <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Semifinal</h4>
-              <div className="my-auto">{renderMatch(psem[0], "semis")}</div>
+              <div className="my-auto text-white">{renderMatch(psem[0], "semis")}</div>
             </div>
           </div>
 
-
-          {/* ================= CENTRO (FINAL Y 3ER PUESTO) ================= */}
           <div className="flex flex-col items-center justify-center gap-12 px-8 min-w-[300px]">
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center text-white">
               <span className="text-4xl mb-2">🏆</span>
               <h3 className="text-xl font-black uppercase font-montserrat text-yellow-500 mb-4 tracking-tighter">Gran Final</h3>
               {renderMatch(mfin[0] || null, "final")}
             </div>
-
-            <div className="flex flex-col items-center mt-12 opacity-80 scale-90">
+            <div className="flex flex-col items-center mt-12 opacity-80 scale-90 text-white">
               <h3 className="text-sm font-black uppercase text-slate-400 mb-4 tracking-widest">3er Puesto</h3>
               {renderMatch(mfin[1] || null, "final")}
             </div>
           </div>
 
-
-          {/* ================= RAMA DERECHA ================= */}
           <div className="flex gap-4 flex-row-reverse">
-            {/* 16vos Derecha (8 partidos) */}
             <div className="flex flex-col gap-4 justify-around py-4">
               <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">16vos</h4>
-              {p16.slice(8,16).map((m, i) => <div key={i} className="my-1">{renderMatch(m, "16vos")}</div>)}
+              {p16.slice(8,16).map((m, i) => <div key={i} className="my-1 text-white">{renderMatch(m, "16vos")}</div>)}
             </div>
-            
-            {/* Octavos Derecha (4 partidos) */}
             <div className="flex flex-col gap-4 justify-around py-16">
               <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Octavos</h4>
-              {poct.slice(4,8).map((m, i) => <div key={i} className="my-6">{renderMatch(m, "octavos")}</div>)}
+              {poct.slice(4,8).map((m, i) => <div key={i} className="my-6 text-white">{renderMatch(m, "octavos")}</div>)}
             </div>
-
-            {/* Cuartos Derecha (2 partidos) */}
             <div className="flex flex-col gap-4 justify-around py-32">
               <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Cuartos</h4>
-              {pcua.slice(2,4).map((m, i) => <div key={i} className="my-12">{renderMatch(m, "cuartos")}</div>)}
+              {pcua.slice(2,4).map((m, i) => <div key={i} className="my-12 text-white">{renderMatch(m, "cuartos")}</div>)}
             </div>
-
-            {/* Semis Derecha (1 partido) */}
             <div className="flex flex-col justify-center">
               <h4 className="text-[10px] font-black uppercase text-white/30 text-center tracking-widest mb-2">Semifinal</h4>
-              <div className="my-auto">{renderMatch(psem[1], "semis")}</div>
+              <div className="my-auto text-white">{renderMatch(psem[1], "semis")}</div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

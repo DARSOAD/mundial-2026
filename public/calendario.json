@@ -1,0 +1,56 @@
+[
+    {
+      "match_id": 1, "date": "2026-06-11", "time_colombia": "13:00", "group": "A", "team_home": "México", "team_away": "Sudáfrica"
+    },
+    {
+      "match_id": 2, "date": "2026-06-11", "time_colombia": "20:00", "group": "A", "team_home": "Corea del Sur", "team_away": "Chequia"
+    },
+    {
+      "match_id": 3, "date": "2026-06-12", "time_colombia": "13:00", "group": "B", "team_home": "Canadá", "team_away": "Bosnia y Herzegovina"
+    },
+    {
+      "match_id": 4, "date": "2026-06-12", "time_colombia": "19:00", "group": "B", "team_home": "Estados Unidos", "team_away": "Paraguay"
+    },
+    {
+      "match_id": 5, "date": "2026-06-13", "time_colombia": "13:00", "group": "C", "team_home": "Qatar", "team_away": "Suiza"
+    },
+    {
+      "match_id": 6, "date": "2026-06-13", "time_colombia": "16:00", "group": "C", "team_home": "Brasil", "team_away": "Marruecos"
+    },
+    {
+      "match_id": 7, "date": "2026-06-13", "time_colombia": "19:00", "group": "D", "team_home": "Haití", "team_away": "Escocia"
+    },
+    {
+      "match_id": 8, "date": "2026-06-13", "time_colombia": "22:00", "group": "D", "team_home": "Australia", "team_away": "Turquía"
+    },
+    {
+      "match_id": 9, "date": "2026-06-14", "time_colombia": "11:00", "group": "E", "team_home": "Alemania", "team_away": "Curazao"
+    },
+    {
+      "match_id": 10, "date": "2026-06-14", "time_colombia": "14:00", "group": "E", "team_home": "Países Bajos", "team_away": "Japón"
+    },
+    {
+      "match_id": 11, "date": "2026-06-14", "time_colombia": "17:00", "group": "F", "team_home": "Costa de Marfil", "team_away": "Ecuador"
+    },
+    {
+      "match_id": 12, "date": "2026-06-14", "time_colombia": "20:00", "group": "F", "team_home": "Suecia", "team_away": "Túnez"
+    },
+    {
+      "match_id": 13, "date": "2026-06-15", "time_colombia": "10:00", "group": "G", "team_home": "España", "team_away": "Cabo Verde"
+    },
+    {
+      "match_id": 14, "date": "2026-06-15", "time_colombia": "13:00", "group": "G", "team_home": "Bélgica", "team_away": "Egipto"
+    },
+    {
+      "match_id": 15, "date": "2026-06-15", "time_colombia": "16:00", "group": "H", "team_home": "Arabia Saudita", "team_away": "Uruguay"
+    },
+    {
+      "match_id": 16, "date": "2026-06-15", "time_colombia": "19:00", "group": "H", "team_home": "Irán", "team_away": "Nueva Zelanda"
+    },
+    {
+      "match_id": 17, "date": "2026-06-28", "time_colombia": "11:00", "group": "16VOS", "team_home": "México", "team_away": "Canadá"
+    },
+    {
+      "match_id": 18, "date": "2026-06-28", "time_colombia": "15:00", "group": "16VOS", "team_home": "Brasil", "team_away": "Alemania"
+    }
+  ]
