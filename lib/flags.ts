@@ -1,18 +1,34 @@
 // lib/flags.ts
 
 export const TEAM_CODES: Record<string, string> = {
-  "México": "mx", "Sudáfrica": "za", "Corea del Sur": "kr", "Chequia": "cz",
-  "Canadá": "ca", "Bosnia y Herzegovina": "ba", "Qatar": "qa", "Suiza": "ch",
-  "Brasil": "br", "Marruecos": "ma", "Haití": "ht", "Escocia": "gb-sct",
-  "USA": "us", "Estados Unidos": "us", "Paraguay": "py", "Australia": "au", "Turquía": "tr",
-  "Alemania": "de", "Curazao": "cw", "Países Bajos": "nl", "Holanda": "nl", "Japón": "jp",
-  "Costa de Marfil": "ci", "Ecuador": "ec", "Suecia": "se", "Túnez": "tn",
-  "España": "es", "Cabo Verde": "cv", "Bélgica": "be", "Egipto": "eg",
-  "Arabia Saudita": "sa", "Uruguay": "uy", "Irán": "ir", "Nueva Zelanda": "nz",
+  "México": "mx", "Mexico": "mx", "Sudáfrica": "za", "Sudafrica": "za",
+  "Corea del Sur": "kr", "Chequia": "cz", "Republica Checa": "cz",
+  "Canadá": "ca", "Canada": "ca", "Bosnia y Herzegovina": "ba", "Bosnia y Hersegobina": "ba",
+  "Qatar": "qa", "Suiza": "ch",
+  "Brasil": "br", "Marruecos": "ma", "Haití": "ht", "Haiti": "ht",
+  "Escocia": "gb-sct",
+  "USA": "us", "Estados Unidos": "us", "Paraguay": "py", "Australia": "au",
+  "Turquía": "tr", "Turquia": "tr",
+  "Alemania": "de", "Curazao": "cw",
+  "Países Bajos": "nl", "Holanda": "nl",
+  "Japón": "jp", "Japon": "jp",
+  "Costa de Marfil": "ci", "Costa de marfil": "ci",
+  "Ecuador": "ec", "Suecia": "se",
+  "Túnez": "tn", "Tunez": "tn",
+  "España": "es", "Espana": "es",
+  "Cabo Verde": "cv", "Cabo verde": "cv",
+  "Bélgica": "be", "Belgica": "be",
+  "Egipto": "eg",
+  "Arabia Saudita": "sa", "Uruguay": "uy",
+  "Irán": "ir", "Iran": "ir",
+  "Nueva Zelanda": "nz",
   "Francia": "fr", "Senegal": "sn", "Iraq": "iq", "Noruega": "no",
   "Argentina": "ar", "Argelia": "dz", "Austria": "at", "Jordania": "jo",
-  "Portugal": "pt", "Congo": "cg", "Uzbekistan": "uz", "Colombia": "co",
-  "Inglaterra": "gb-eng", "Croacia": "hr", "Ghana": "gh", "Panama": "pa"
+  "Portugal": "pt", "Congo": "cg", "RD Congo": "cd",
+  "Uzbekistan": "uz", "Colombia": "co",
+  "Inglaterra": "gb-eng", "Croacia": "hr", "Ghana": "gh",
+  "Panama": "pa", "Panamá": "pa",
+  "Sur Africa": "za", "Sur Korea": "kr"
 };
 
 /**
