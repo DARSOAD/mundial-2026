@@ -24,8 +24,7 @@ export default function LoginClient({ users }: { users: { userId: string, name: 
     const result = await loginUser(selectedUser, password);
     
     if (result.success) {
-      router.push("/profile");
-      router.refresh();
+      window.location.href = "/mundial-2026/profile/";
     } else {
       setError(result.error || "Error al iniciar sesión");
       setIsLoading(false);

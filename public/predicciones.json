@@ -1,6 +1,7 @@
 [
     {
       "participante": "Diego",
+      "password": "diego3779",
       "predicciones_partidos": {
         "mex_saf": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Africa", "goles_visitante": 1 },
         "mex_sko": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Korea", "goles_visitante": 2 },
@@ -95,6 +96,7 @@
     },
     {
         "participante": "Luly",
+        "password": "luly9451",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Africa", "goles_visitante": 1 },
           "mex_sko": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Korea", "goles_visitante": 1 },
@@ -189,6 +191,7 @@
     },
     {
         "participante": "Beto",
+        "password": "beto2755",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Africa", "goles_visitante": 1 },
           "mex_sko": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Korea", "goles_visitante": 1 },
@@ -283,6 +286,7 @@
     },
     {
         "participante": "Sebas",
+        "password": "sebas6973",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Africa", "goles_visitante": 0 },
           "mex_sko": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Korea", "goles_visitante": 1 },
@@ -377,6 +381,7 @@
     },
     {
         "participante": "Adriana",
+        "password": "adriana4450",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Africa", "goles_visitante": 1 },
           "mex_sko": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Korea", "goles_visitante": 0 },
@@ -471,6 +476,7 @@
     },
     {
         "participante": "Jairo",
+        "password": "jairo5075",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Africa", "goles_visitante": 0 },
           "mex_sko": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Korea", "goles_visitante": 1 },
@@ -565,6 +571,7 @@
     },
     {
         "participante": "Pacho y Aura Maria",
+        "password": "pacho_y_aura_maria2941",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Africa", "goles_visitante": 0 },
           "mex_sko": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Korea", "goles_visitante": 1 },
@@ -659,6 +666,7 @@
     },
     {
         "participante": "Memo",
+        "password": "memo2555",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Africa", "goles_visitante": 0 },
           "mex_sko": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Korea", "goles_visitante": 1 },
@@ -753,6 +761,7 @@
     },
     {
         "participante": "Juank",
+        "password": "juank3159",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Africa", "goles_visitante": 1 },
           "mex_sko": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Korea", "goles_visitante": 1 },
@@ -847,6 +856,7 @@
     },
     {
         "participante": "Sandra",
+        "password": "sandra4305",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Africa", "goles_visitante": 1 },
           "mex_sko": { "local": "Mexico", "goles_local": 0, "visitante": "Sur Korea", "goles_visitante": 1 },
@@ -941,6 +951,7 @@
     },
     {
         "participante": "Sofia, Juliana y Mariana",
+        "password": "sofia,_juliana_y_mariana7492",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Africa", "goles_visitante": 0 },
           "mex_sko": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Korea", "goles_visitante": 2 },
@@ -1035,6 +1046,7 @@
     },
     {
         "participante": "Lalo y Juan Andrés",
+        "password": "lalo_y_juan_andrés3011",
         "predicciones_partidos": {
           "mex_saf": { "local": "Mexico", "goles_local": 2, "visitante": "Sur Africa", "goles_visitante": 0 },
           "mex_sko": { "local": "Mexico", "goles_local": 1, "visitante": "Sur Korea", "goles_visitante": 1 },
