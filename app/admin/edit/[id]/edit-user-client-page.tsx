@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSnapshotData } from "@/lib/data";
+import { getParticipants } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
 import { notFound } from "next/navigation";
 import EditUserForm from "./edit-client";
@@ -14,18 +14,18 @@ export default function EditUserClientPage({ id }: { id: string }) {
 
   useEffect(() => {
     async function load() {
-      const [u, snap, m] = await Promise.all([
+      const [u, participants, m] = await Promise.all([
         getLoggedInUser(),
-        getSnapshotData(),
+        getParticipants(),
         getAllMatches()
       ]);
-      
+
       if (!u || u.userId !== 'diego') {
         window.location.href = '/mundial-2026/';
         return;
       }
 
-      const target = snap.participants?.find((p: any) => p.userId === id);
+      const target = participants?.find((p: any) => p.userId === id);
       if (!target) {
         setIsLoading(false);
         return;

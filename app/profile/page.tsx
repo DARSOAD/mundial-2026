@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getLoggedInUser } from "@/lib/auth";
 import { getAllMatches } from "@/lib/matches";
-import { getSnapshotData } from "@/lib/data";
+import { getSystemSettings } from "@/lib/data";
 import ProfileClient from "./profile-client";
 
 export default function ProfilePage() {
@@ -14,12 +14,12 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function load() {
-      const [u, m, snap] = await Promise.all([
+      const [u, m, settings] = await Promise.all([
         getLoggedInUser(),
         getAllMatches(),
-        getSnapshotData()
+        getSystemSettings()
       ]);
-      
+
       if (!u) {
         window.location.href = '/mundial-2026/login';
         return;
@@ -27,7 +27,7 @@ export default function ProfilePage() {
 
       setUser(u);
       setMatches(m);
-      setActivePhases(snap.settings?.activePhases || ["grupos"]);
+      setActivePhases(settings?.activePhases || ["grupos"]);
       setIsLoading(false);
     }
     load();

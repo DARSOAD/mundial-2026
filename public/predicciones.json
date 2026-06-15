@@ -122,7 +122,7 @@
           "usa_tur": { "local": "USA", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 2 },
           "par_aus1":{ "local": "Paraguay", "goles_local": 1, "visitante": "Australia", "goles_visitante": 0 },
           "par_tur": { "local": "Paraguay", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 1 },
-          "aus1_tur": { "local": "Australia", "goles_local": null, "visitante": "Turquia", "goles_visitante": null }, 
+          "aus1_tur": { "local": "Australia", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 2 }, 
     
           "ale_cur": { "local": "Alemania", "goles_local": 3, "visitante": "Curazao", "goles_visitante": 0 },
           "ale_cdm": { "local": "Alemania", "goles_local": 2, "visitante": "Costa de marfil", "goles_visitante": 1 },
@@ -216,7 +216,7 @@
           "usa_tur": { "local": "USA", "goles_local": 2, "visitante": "Turquia", "goles_visitante": 1 },
           "par_aus1":{ "local": "Paraguay", "goles_local": 1, "visitante": "Australia", "goles_visitante": 0 },
           "par_tur": { "local": "Paraguay", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 1 },
-          "aus1_tur": { "local": "Australia", "goles_local": null, "visitante": "Turquia", "goles_visitante": null }, 
+          "aus1_tur": { "local": "Australia", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 2 }, 
     
           "ale_cur": { "local": "Alemania", "goles_local": 3, "visitante": "Curazao", "goles_visitante": 0 },
           "ale_cdm": { "local": "Alemania", "goles_local": 2, "visitante": "Costa de marfil", "goles_visitante": 0 },
@@ -404,7 +404,7 @@
           "usa_tur": { "local": "USA", "goles_local": 3, "visitante": "Turquia", "goles_visitante": 0 },
           "par_aus1":{ "local": "Paraguay", "goles_local": 1, "visitante": "Australia", "goles_visitante": 1 },
           "par_tur": { "local": "Paraguay", "goles_local": 2, "visitante": "Turquia", "goles_visitante": 0 },
-          "aus1_tur": { "local": "Australia", "goles_local": null, "visitante": "Turquia", "goles_visitante": null }, 
+          "aus1_tur": { "local": "Australia", "goles_local": 0, "visitante": "Turquia", "goles_visitante": 3 }, 
     
           "ale_cur": { "local": "Alemania", "goles_local": 4, "visitante": "Curazao", "goles_visitante": 0 },
           "ale_cdm": { "local": "Alemania", "goles_local": 3, "visitante": "Costa de marfil", "goles_visitante": 0 },
@@ -498,7 +498,7 @@
           "usa_tur": { "local": "USA", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 0 },
           "par_aus1":{ "local": "Paraguay", "goles_local": 2, "visitante": "Australia", "goles_visitante": 1 },
           "par_tur": { "local": "Paraguay", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 1 },
-          "aus1_tur": { "local": "Australia", "goles_local": null, "visitante": "Turquia", "goles_visitante": null }, 
+          "aus1_tur": { "local": "Australia", "goles_local": 2, "visitante": "Turquia", "goles_visitante": 2 }, 
     
           "ale_cur": { "local": "Alemania", "goles_local": 6, "visitante": "Curazao", "goles_visitante": 0 },
           "ale_cdm": { "local": "Alemania", "goles_local": 4, "visitante": "Costa de marfil", "goles_visitante": 0 },
@@ -592,7 +592,7 @@
           "usa_tur": { "local": "USA", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 1 },
           "par_aus1":{ "local": "Paraguay", "goles_local": 2, "visitante": "Australia", "goles_visitante": 1 },
           "par_tur": { "local": "Paraguay", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 2 },
-          "aus1_tur": { "local": "Australia", "goles_local": null, "visitante": "Turquia", "goles_visitante": null }, 
+          "aus1_tur": { "local": "Australia", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 3 }, 
     
           "ale_cur": { "local": "Alemania", "goles_local": 4, "visitante": "Curazao", "goles_visitante": 0 },
           "ale_cdm": { "local": "Alemania", "goles_local": 2, "visitante": "Costa de marfil", "goles_visitante": 0 },
@@ -674,7 +674,7 @@
           "bih_sui": { "local": "Bosnia y Hersegobina", "goles_local": 0, "visitante": "Suiza", "goles_visitante": 1 },
           "qat_sui": { "local": "Qatar", "goles_local": 0, "visitante": "Suiza", "goles_visitante": 2 },
     
-          "bra_mar": { "local": "Brasil", "goles_local": null, "visitante": "Marruecos", "goles_visitante": null },
+          "bra_mar": { "local": "Brasil", "goles_local": 2, "visitante": "Marruecos", "goles_visitante": 1 },
           "bra_hai": { "local": "Brasil", "goles_local": 3, "visitante": "Haiti", "goles_visitante": 0 },
           "bra_esc": { "local": "Brasil", "goles_local": 2, "visitante": "Escocia", "goles_visitante": 0 },
           "mar_hai": { "local": "Marruecos", "goles_local": 2, "visitante": "Haiti", "goles_visitante": 0 },
@@ -686,7 +686,7 @@
           "usa_tur": { "local": "USA", "goles_local": 2, "visitante": "Turquia", "goles_visitante": 2 },
           "par_aus1":{ "local": "Paraguay", "goles_local": 2, "visitante": "Australia", "goles_visitante": 1 },
           "par_tur": { "local": "Paraguay", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 2 },
-          "aus1_tur": { "local": "Australia", "goles_local": null, "visitante": "Turquia", "goles_visitante": null }, 
+          "aus1_tur": { "local": "Australia", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 1 }, 
     
           "ale_cur": { "local": "Alemania", "goles_local": 3, "visitante": "Curazao", "goles_visitante": 0 },
           "ale_cdm": { "local": "Alemania", "goles_local": 1, "visitante": "Costa de marfil", "goles_visitante": 0 },
@@ -780,7 +780,7 @@
           "usa_tur": { "local": "USA", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 2 },
           "par_aus1":{ "local": "Paraguay", "goles_local": 1, "visitante": "Australia", "goles_visitante": 0 },
           "par_tur": { "local": "Paraguay", "goles_local": 2, "visitante": "Turquia", "goles_visitante": 1 },
-          "aus1_tur": { "local": "Australia", "goles_local": null, "visitante": "Turquia", "goles_visitante": null }, 
+          "aus1_tur": { "local": "Australia", "goles_local": 2, "visitante": "Turquia", "goles_visitante": 2 }, 
     
           "ale_cur": { "local": "Alemania", "goles_local": 4, "visitante": "Curazao", "goles_visitante": 0 },
           "ale_cdm": { "local": "Alemania", "goles_local": 3, "visitante": "Costa de marfil", "goles_visitante": 1 },
@@ -874,7 +874,7 @@
           "usa_tur": { "local": "USA", "goles_local": 0, "visitante": "Turquia", "goles_visitante": 0 },
           "par_aus1":{ "local": "Paraguay", "goles_local": 1, "visitante": "Australia", "goles_visitante": 0 },
           "par_tur": { "local": "Paraguay", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 2 },
-          "aus1_tur": { "local": "Australia", "goles_local": null, "visitante": "Turquia", "goles_visitante": null }, 
+          "aus1_tur": { "local": "Australia", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 0 }, 
     
           "ale_cur": { "local": "Alemania", "goles_local": 3, "visitante": "Curazao", "goles_visitante": 0 },
           "ale_cdm": { "local": "Alemania", "goles_local": 4, "visitante": "Costa de marfil", "goles_visitante": 0 },
@@ -968,7 +968,7 @@
           "usa_tur": { "local": "USA", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 2 },
           "par_aus1":{ "local": "Paraguay", "goles_local": 3, "visitante": "Australia", "goles_visitante": 1 },
           "par_tur": { "local": "Paraguay", "goles_local": 2, "visitante": "Turquia", "goles_visitante": 2 },
-          "aus1_tur": { "local": "Australia", "goles_local": null, "visitante": "Turquia", "goles_visitante": null }, 
+          "aus1_tur": { "local": "Australia", "goles_local": 1, "visitante": "Turquia", "goles_visitante": 2 }, 
     
           "ale_cur": { "local": "Alemania", "goles_local": 3, "visitante": "Curazao", "goles_visitante": 0 },
           "ale_cdm": { "local": "Alemania", "goles_local": 1, "visitante": "Costa de marfil", "goles_visitante": 1 },

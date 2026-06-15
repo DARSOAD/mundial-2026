@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSnapshotData } from "@/lib/data";
+import { getResults } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
 import { getFlag } from "@/lib/flags";
 import Link from "next/link";
@@ -13,8 +13,8 @@ export default function MatchesPage() {
 
   useEffect(() => {
     async function load() {
-      const [snap, m] = await Promise.all([getSnapshotData(), getAllMatches()]);
-      setData(snap);
+      const [results, m] = await Promise.all([getResults(), getAllMatches()]);
+      setData({ realResults: results });
       setMatches(m);
       setIsLoading(false);
     }
@@ -23,10 +23,7 @@ export default function MatchesPage() {
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-yellow-500 uppercase tracking-widest animate-pulse">Cargando Partidos...</div>;
 
-  const realResults: Record<string, { home: number, away: number }> = {
-    "mex_saf": { home: 2, away: 0 },
-    "sko_rch": { home: 2, away: 1 }
-  };
+  const realResults = data.realResults || {};
 
   return (
     <div className="max-w-6xl mx-auto py-12 px-4">
@@ -60,9 +57,9 @@ export default function MatchesPage() {
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <div className="flex items-center gap-4">
-                    <span className="text-3xl font-black text-white">{result ? result.home : "-"}</span>
+                    <span className="text-3xl font-black text-white">{result ? result.homeGoals : "-"}</span>
                     <span className="text-red-600 font-black text-xl">:</span>
-                    <span className="text-3xl font-black text-white">{result ? result.away : "-"}</span>
+                    <span className="text-3xl font-black text-white">{result ? result.awayGoals : "-"}</span>
                   </div>
                   <span className={`text-[8px] font-bold uppercase tracking-[0.2em] ${result ? 'text-yellow-500 bg-yellow-500/10' : 'text-white/20'} px-3 py-1 rounded-full`}>
                     {result ? 'Finalizado' : match.time}

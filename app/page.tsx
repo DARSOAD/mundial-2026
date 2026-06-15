@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getAllMatches } from "@/lib/matches";
 import { getFlag } from "@/lib/flags";
 import { getDetailedPoints, MatchResult } from "@/lib/scoring";
-import { getSnapshotData } from "@/lib/data";
+import { getResults, getParticipants } from "@/lib/data";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -14,11 +14,12 @@ export default function HomePage() {
 
   useEffect(() => {
     async function load() {
-      const [snap, m] = await Promise.all([
-        getSnapshotData(),
+      const [results, participants, m] = await Promise.all([
+        getResults(),
+        getParticipants(),
         getAllMatches()
       ]);
-      setData(snap);
+      setData({ participants, realResults: results });
       setMatches(m);
       setIsLoading(false);
     }

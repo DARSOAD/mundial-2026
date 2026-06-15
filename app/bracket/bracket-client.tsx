@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { updateParticipantPredictions } from "@/lib/admin-actions";
 import { useRouter } from "next/navigation";
 import { getFlag } from "@/lib/flags";
 
@@ -23,13 +22,7 @@ export default function BracketClient({ user, knockoutMatches, activePhases }: {
 
   const handleSave = async () => {
     setIsSaving(true);
-    const result = await updateParticipantPredictions(user.userId, preds, user.finals);
-    if (result.success) {
-      alert("✅ ¡Tus pronósticos de eliminatorias se han guardado!");
-      router.refresh();
-    } else {
-      alert("❌ Hubo un error al guardar");
-    }
+    alert("Las predicciones de eliminatorias son de solo lectura por ahora.");
     setIsSaving(false);
   };
 

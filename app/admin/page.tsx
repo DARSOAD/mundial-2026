@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { getLoggedInUser } from "@/lib/auth";
-import { getParticipants, getSystemSettings } from "@/lib/data";
+import { getParticipants } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
 import Link from "next/link";
-import PhaseToggle from "./phase-toggle";
 
 export default function AdminPage() {
   const [user, setUser] = useState<any>(null);
@@ -15,11 +14,10 @@ export default function AdminPage() {
 
   useEffect(() => {
     async function load() {
-      const [u, participants, m, settings] = await Promise.all([
+      const [u, participants, m] = await Promise.all([
         getLoggedInUser(),
         getParticipants(),
-        getAllMatches(),
-        getSystemSettings()
+        getAllMatches()
       ]);
       
       if (!u || u.userId !== 'diego') {
@@ -28,7 +26,7 @@ export default function AdminPage() {
       }
 
       setUser(u);
-      setData({ participants, settings });
+      setData({ participants });
       setMatches(m);
       setIsLoading(false);
     }
@@ -38,7 +36,7 @@ export default function AdminPage() {
   if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-red-500 uppercase tracking-widest animate-pulse">Verificando Admin...</div>;
 
   const participants = data.participants;
-  const activePhases = data.settings.activePhases || [];
+  const activePhases = ["grupos"];
 
   const usersWithStatus = participants.map((p: any) => {
     let missingMatches = 0;
@@ -60,11 +58,11 @@ export default function AdminPage() {
     <div className="max-w-6xl mx-auto py-12 px-4">
       <div className="flex items-center justify-between mb-12">
         <h2 className="text-4xl font-black text-white uppercase font-montserrat">⚙️ Panel Admin</h2>
-        <button className="bg-yellow-500 text-black font-black px-6 py-3 rounded-xl text-xs uppercase">Sincronizar API</button>
+        <Link href="/admin/results" className="bg-yellow-500 text-black font-black px-6 py-3 rounded-xl text-xs uppercase">Actualizar Resultados</Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-[2rem] overflow-hidden">
+      <div className="grid grid-cols-1 gap-8">
+        <div className="bg-white/5 border border-white/10 rounded-[2rem] overflow-hidden">
           <div className="p-6 border-b border-white/5 bg-red-600/10"><h3 className="font-black uppercase">Estado Predicciones</h3></div>
           <div className="divide-y divide-white/5">
             {usersWithStatus.map((u: any) => (
@@ -77,14 +75,6 @@ export default function AdminPage() {
               </div>
             ))}
           </div>
-        </div>
-        <div className="bg-white/5 border border-white/10 rounded-[2rem] p-8">
-           <h3 className="font-black uppercase mb-6 text-blue-500">Fases</h3>
-           <div className="flex flex-col gap-4">
-              {["grupos", "16vos", "octavos", "cuartos", "semis", "final"].map(f => (
-                <PhaseToggle key={f} phaseId={f} label={f.toUpperCase()} isActive={activePhases.includes(f)} />
-              ))}
-           </div>
         </div>
       </div>
     </div>

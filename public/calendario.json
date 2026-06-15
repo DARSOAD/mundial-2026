@@ -1,56 +1,74 @@
 [
-    {
-      "match_id": 1, "date": "2026-06-11", "time_colombia": "13:00", "group": "A", "team_home": "México", "team_away": "Sudáfrica"
-    },
-    {
-      "match_id": 2, "date": "2026-06-11", "time_colombia": "20:00", "group": "A", "team_home": "Corea del Sur", "team_away": "Chequia"
-    },
-    {
-      "match_id": 3, "date": "2026-06-12", "time_colombia": "13:00", "group": "B", "team_home": "Canadá", "team_away": "Bosnia y Herzegovina"
-    },
-    {
-      "match_id": 4, "date": "2026-06-12", "time_colombia": "19:00", "group": "B", "team_home": "Estados Unidos", "team_away": "Paraguay"
-    },
-    {
-      "match_id": 5, "date": "2026-06-13", "time_colombia": "13:00", "group": "C", "team_home": "Qatar", "team_away": "Suiza"
-    },
-    {
-      "match_id": 6, "date": "2026-06-13", "time_colombia": "16:00", "group": "C", "team_home": "Brasil", "team_away": "Marruecos"
-    },
-    {
-      "match_id": 7, "date": "2026-06-13", "time_colombia": "19:00", "group": "D", "team_home": "Haití", "team_away": "Escocia"
-    },
-    {
-      "match_id": 8, "date": "2026-06-13", "time_colombia": "22:00", "group": "D", "team_home": "Australia", "team_away": "Turquía"
-    },
-    {
-      "match_id": 9, "date": "2026-06-14", "time_colombia": "11:00", "group": "E", "team_home": "Alemania", "team_away": "Curazao"
-    },
-    {
-      "match_id": 10, "date": "2026-06-14", "time_colombia": "14:00", "group": "E", "team_home": "Países Bajos", "team_away": "Japón"
-    },
-    {
-      "match_id": 11, "date": "2026-06-14", "time_colombia": "17:00", "group": "F", "team_home": "Costa de Marfil", "team_away": "Ecuador"
-    },
-    {
-      "match_id": 12, "date": "2026-06-14", "time_colombia": "20:00", "group": "F", "team_home": "Suecia", "team_away": "Túnez"
-    },
-    {
-      "match_id": 13, "date": "2026-06-15", "time_colombia": "10:00", "group": "G", "team_home": "España", "team_away": "Cabo Verde"
-    },
-    {
-      "match_id": 14, "date": "2026-06-15", "time_colombia": "13:00", "group": "G", "team_home": "Bélgica", "team_away": "Egipto"
-    },
-    {
-      "match_id": 15, "date": "2026-06-15", "time_colombia": "16:00", "group": "H", "team_home": "Arabia Saudita", "team_away": "Uruguay"
-    },
-    {
-      "match_id": 16, "date": "2026-06-15", "time_colombia": "19:00", "group": "H", "team_home": "Irán", "team_away": "Nueva Zelanda"
-    },
-    {
-      "match_id": 17, "date": "2026-06-28", "time_colombia": "11:00", "group": "16VOS", "team_home": "México", "team_away": "Canadá"
-    },
-    {
-      "match_id": 18, "date": "2026-06-28", "time_colombia": "15:00", "group": "16VOS", "team_home": "Brasil", "team_away": "Alemania"
-    }
-  ]
+  {"match_id":1,"pred_id":"mex_saf","date":"2026-06-11","time_colombia":"14:00","group":"A","team_home":"Mexico","team_away":"Sudafrica","home_is_pred_local":true},
+  {"match_id":2,"pred_id":"sko_rch","date":"2026-06-11","time_colombia":"21:00","group":"A","team_home":"Corea del Sur","team_away":"Republica Checa","home_is_pred_local":true},
+  {"match_id":3,"pred_id":"can_bih","date":"2026-06-12","time_colombia":"14:00","group":"B","team_home":"Canada","team_away":"Bosnia y Herzegovina","home_is_pred_local":true},
+  {"match_id":4,"pred_id":"usa_par","date":"2026-06-12","time_colombia":"20:00","group":"D","team_home":"USA","team_away":"Paraguay","home_is_pred_local":true},
+  {"match_id":5,"pred_id":"qat_sui","date":"2026-06-13","time_colombia":"14:00","group":"B","team_home":"Qatar","team_away":"Suiza","home_is_pred_local":true},
+  {"match_id":6,"pred_id":"bra_mar","date":"2026-06-13","time_colombia":"17:00","group":"C","team_home":"Brasil","team_away":"Marruecos","home_is_pred_local":true},
+  {"match_id":7,"pred_id":"hai_esc","date":"2026-06-13","time_colombia":"20:00","group":"C","team_home":"Haiti","team_away":"Escocia","home_is_pred_local":true},
+  {"match_id":8,"pred_id":"aus1_tur","date":"2026-06-13","time_colombia":"23:00","group":"D","team_home":"Australia","team_away":"Turquia","home_is_pred_local":true},
+  {"match_id":9,"pred_id":"ale_cur","date":"2026-06-14","time_colombia":"12:00","group":"E","team_home":"Alemania","team_away":"Curazao","home_is_pred_local":true},
+  {"match_id":10,"pred_id":"hol_jap","date":"2026-06-14","time_colombia":"15:00","group":"F","team_home":"Holanda","team_away":"Japon","home_is_pred_local":true},
+  {"match_id":11,"pred_id":"cdm_ecu","date":"2026-06-14","time_colombia":"18:00","group":"E","team_home":"Costa de Marfil","team_away":"Ecuador","home_is_pred_local":true},
+  {"match_id":12,"pred_id":"sue_tun","date":"2026-06-14","time_colombia":"21:00","group":"F","team_home":"Suecia","team_away":"Tunez","home_is_pred_local":true},
+  {"match_id":13,"pred_id":"esp_cve","date":"2026-06-15","time_colombia":"11:00","group":"G","team_home":"Espana","team_away":"Cabo Verde","home_is_pred_local":true},
+  {"match_id":14,"pred_id":"bel_egi","date":"2026-06-15","time_colombia":"14:00","group":"H","team_home":"Belgica","team_away":"Egipto","home_is_pred_local":true},
+  {"match_id":15,"pred_id":"asa_uru","date":"2026-06-15","time_colombia":"17:00","group":"G","team_home":"Arabia Saudita","team_away":"Uruguay","home_is_pred_local":true},
+  {"match_id":16,"pred_id":"ira_nze","date":"2026-06-15","time_colombia":"20:00","group":"H","team_home":"Iran","team_away":"Nueva Zelanda","home_is_pred_local":true},
+  {"match_id":17,"pred_id":"fra_sen","date":"2026-06-16","time_colombia":"14:00","group":"I","team_home":"Francia","team_away":"Senegal","home_is_pred_local":true},
+  {"match_id":18,"pred_id":"irq_nor","date":"2026-06-16","time_colombia":"17:00","group":"I","team_home":"Iraq","team_away":"Noruega","home_is_pred_local":true},
+  {"match_id":19,"pred_id":"arg_alg","date":"2026-06-16","time_colombia":"20:00","group":"J","team_home":"Argentina","team_away":"Argelia","home_is_pred_local":true},
+  {"match_id":20,"pred_id":"aut_jor","date":"2026-06-16","time_colombia":"23:00","group":"J","team_home":"Austria","team_away":"Jordania","home_is_pred_local":true},
+  {"match_id":21,"pred_id":"por_con","date":"2026-06-17","time_colombia":"12:00","group":"K","team_home":"Portugal","team_away":"Congo","home_is_pred_local":true},
+  {"match_id":22,"pred_id":"ing_cro","date":"2026-06-17","time_colombia":"15:00","group":"L","team_home":"Inglaterra","team_away":"Croacia","home_is_pred_local":true},
+  {"match_id":23,"pred_id":"gha_pan","date":"2026-06-17","time_colombia":"18:00","group":"L","team_home":"Ghana","team_away":"Panama","home_is_pred_local":true},
+  {"match_id":24,"pred_id":"uzb_col","date":"2026-06-17","time_colombia":"21:00","group":"K","team_home":"Uzbekistan","team_away":"Colombia","home_is_pred_local":true},
+  {"match_id":25,"pred_id":"saf_rch","date":"2026-06-18","time_colombia":"11:00","group":"A","team_home":"Republica Checa","team_away":"Sudafrica","home_is_pred_local":false},
+  {"match_id":26,"pred_id":"bih_sui","date":"2026-06-18","time_colombia":"14:00","group":"B","team_home":"Suiza","team_away":"Bosnia y Herzegovina","home_is_pred_local":false},
+  {"match_id":27,"pred_id":"can_qat","date":"2026-06-18","time_colombia":"17:00","group":"B","team_home":"Canada","team_away":"Qatar","home_is_pred_local":true},
+  {"match_id":28,"pred_id":"mex_sko","date":"2026-06-18","time_colombia":"20:00","group":"A","team_home":"Mexico","team_away":"Corea del Sur","home_is_pred_local":true},
+  {"match_id":29,"pred_id":"usa_aus1","date":"2026-06-19","time_colombia":"14:00","group":"D","team_home":"USA","team_away":"Australia","home_is_pred_local":true},
+  {"match_id":30,"pred_id":"mar_esc","date":"2026-06-19","time_colombia":"17:00","group":"C","team_home":"Escocia","team_away":"Marruecos","home_is_pred_local":false},
+  {"match_id":31,"pred_id":"bra_hai","date":"2026-06-19","time_colombia":"20:00","group":"C","team_home":"Brasil","team_away":"Haiti","home_is_pred_local":true},
+  {"match_id":32,"pred_id":"par_tur","date":"2026-06-19","time_colombia":"23:00","group":"D","team_home":"Turquia","team_away":"Paraguay","home_is_pred_local":false},
+  {"match_id":33,"pred_id":"hol_sue","date":"2026-06-20","time_colombia":"14:00","group":"F","team_home":"Holanda","team_away":"Suecia","home_is_pred_local":true},
+  {"match_id":34,"pred_id":"ale_cdm","date":"2026-06-20","time_colombia":"15:00","group":"E","team_home":"Alemania","team_away":"Costa de Marfil","home_is_pred_local":true},
+  {"match_id":35,"pred_id":"cur_ecu","date":"2026-06-20","time_colombia":"19:00","group":"E","team_home":"Ecuador","team_away":"Curazao","home_is_pred_local":false},
+  {"match_id":36,"pred_id":"jap_tun","date":"2026-06-20","time_colombia":"23:00","group":"F","team_home":"Tunez","team_away":"Japon","home_is_pred_local":false},
+  {"match_id":37,"pred_id":"esp_asa","date":"2026-06-21","time_colombia":"11:00","group":"G","team_home":"Espana","team_away":"Arabia Saudita","home_is_pred_local":true},
+  {"match_id":38,"pred_id":"bel_ira","date":"2026-06-21","time_colombia":"14:00","group":"H","team_home":"Belgica","team_away":"Iran","home_is_pred_local":true},
+  {"match_id":39,"pred_id":"cve_uru","date":"2026-06-21","time_colombia":"17:00","group":"G","team_home":"Uruguay","team_away":"Cabo Verde","home_is_pred_local":false},
+  {"match_id":40,"pred_id":"egi_nze","date":"2026-06-21","time_colombia":"20:00","group":"H","team_home":"Nueva Zelanda","team_away":"Egipto","home_is_pred_local":false},
+  {"match_id":41,"pred_id":"arg_aut","date":"2026-06-22","time_colombia":"12:00","group":"J","team_home":"Argentina","team_away":"Austria","home_is_pred_local":true},
+  {"match_id":42,"pred_id":"fra_irq","date":"2026-06-22","time_colombia":"16:00","group":"I","team_home":"Francia","team_away":"Iraq","home_is_pred_local":true},
+  {"match_id":43,"pred_id":"sen_nor","date":"2026-06-22","time_colombia":"19:00","group":"I","team_home":"Noruega","team_away":"Senegal","home_is_pred_local":false},
+  {"match_id":44,"pred_id":"alg_jor","date":"2026-06-22","time_colombia":"22:00","group":"J","team_home":"Jordania","team_away":"Argelia","home_is_pred_local":false},
+  {"match_id":45,"pred_id":"por_uzb","date":"2026-06-23","time_colombia":"12:00","group":"K","team_home":"Portugal","team_away":"Uzbekistan","home_is_pred_local":true},
+  {"match_id":46,"pred_id":"ing_gha","date":"2026-06-23","time_colombia":"15:00","group":"L","team_home":"Inglaterra","team_away":"Ghana","home_is_pred_local":true},
+  {"match_id":47,"pred_id":"cro_pan","date":"2026-06-23","time_colombia":"18:00","group":"L","team_home":"Panama","team_away":"Croacia","home_is_pred_local":false},
+  {"match_id":48,"pred_id":"con_col","date":"2026-06-23","time_colombia":"21:00","group":"K","team_home":"Colombia","team_away":"Congo","home_is_pred_local":false},
+  {"match_id":49,"pred_id":"can_sui","date":"2026-06-24","time_colombia":"14:00","group":"B","team_home":"Suiza","team_away":"Canada","home_is_pred_local":false},
+  {"match_id":50,"pred_id":"bih_qat","date":"2026-06-24","time_colombia":"14:00","group":"B","team_home":"Bosnia y Herzegovina","team_away":"Qatar","home_is_pred_local":true},
+  {"match_id":51,"pred_id":"bra_esc","date":"2026-06-24","time_colombia":"17:00","group":"C","team_home":"Escocia","team_away":"Brasil","home_is_pred_local":false},
+  {"match_id":52,"pred_id":"mar_hai","date":"2026-06-24","time_colombia":"17:00","group":"C","team_home":"Marruecos","team_away":"Haiti","home_is_pred_local":true},
+  {"match_id":53,"pred_id":"mex_rch","date":"2026-06-24","time_colombia":"20:00","group":"A","team_home":"Republica Checa","team_away":"Mexico","home_is_pred_local":false},
+  {"match_id":54,"pred_id":"saf_sko","date":"2026-06-24","time_colombia":"20:00","group":"A","team_home":"Sudafrica","team_away":"Corea del Sur","home_is_pred_local":true},
+  {"match_id":55,"pred_id":"cur_cdm","date":"2026-06-25","time_colombia":"15:00","group":"E","team_home":"Curazao","team_away":"Costa de Marfil","home_is_pred_local":true},
+  {"match_id":56,"pred_id":"ale_ecu","date":"2026-06-25","time_colombia":"15:00","group":"E","team_home":"Ecuador","team_away":"Alemania","home_is_pred_local":false},
+  {"match_id":57,"pred_id":"jap_sue","date":"2026-06-25","time_colombia":"18:00","group":"F","team_home":"Japon","team_away":"Suecia","home_is_pred_local":true},
+  {"match_id":58,"pred_id":"hol_tun","date":"2026-06-25","time_colombia":"18:00","group":"F","team_home":"Tunez","team_away":"Holanda","home_is_pred_local":false},
+  {"match_id":59,"pred_id":"usa_tur","date":"2026-06-25","time_colombia":"21:00","group":"D","team_home":"Turquia","team_away":"USA","home_is_pred_local":false},
+  {"match_id":60,"pred_id":"par_aus1","date":"2026-06-25","time_colombia":"21:00","group":"D","team_home":"Paraguay","team_away":"Australia","home_is_pred_local":true},
+  {"match_id":61,"pred_id":"fra_nor","date":"2026-06-26","time_colombia":"14:00","group":"I","team_home":"Noruega","team_away":"Francia","home_is_pred_local":false},
+  {"match_id":62,"pred_id":"sen_irq","date":"2026-06-26","time_colombia":"14:00","group":"I","team_home":"Senegal","team_away":"Iraq","home_is_pred_local":true},
+  {"match_id":63,"pred_id":"cve_asa","date":"2026-06-26","time_colombia":"19:00","group":"G","team_home":"Cabo Verde","team_away":"Arabia Saudita","home_is_pred_local":true},
+  {"match_id":64,"pred_id":"esp_uru","date":"2026-06-26","time_colombia":"19:00","group":"G","team_home":"Uruguay","team_away":"Espana","home_is_pred_local":false},
+  {"match_id":65,"pred_id":"egi_ira","date":"2026-06-26","time_colombia":"22:00","group":"H","team_home":"Egipto","team_away":"Iran","home_is_pred_local":true},
+  {"match_id":66,"pred_id":"bel_nze","date":"2026-06-26","time_colombia":"22:00","group":"H","team_home":"Nueva Zelanda","team_away":"Belgica","home_is_pred_local":false},
+  {"match_id":67,"pred_id":"ing_pan","date":"2026-06-27","time_colombia":"16:00","group":"L","team_home":"Panama","team_away":"Inglaterra","home_is_pred_local":false},
+  {"match_id":68,"pred_id":"cro_gha","date":"2026-06-27","time_colombia":"16:00","group":"L","team_home":"Croacia","team_away":"Ghana","home_is_pred_local":true},
+  {"match_id":69,"pred_id":"por_col","date":"2026-06-27","time_colombia":"18:30","group":"K","team_home":"Colombia","team_away":"Portugal","home_is_pred_local":false},
+  {"match_id":70,"pred_id":"con_uzb","date":"2026-06-27","time_colombia":"18:30","group":"K","team_home":"Congo","team_away":"Uzbekistan","home_is_pred_local":true},
+  {"match_id":71,"pred_id":"alg_aut","date":"2026-06-27","time_colombia":"21:00","group":"J","team_home":"Argelia","team_away":"Austria","home_is_pred_local":true},
+  {"match_id":72,"pred_id":"arg_jor","date":"2026-06-27","time_colombia":"21:00","group":"J","team_home":"Jordania","team_away":"Argentina","home_is_pred_local":false}
+]

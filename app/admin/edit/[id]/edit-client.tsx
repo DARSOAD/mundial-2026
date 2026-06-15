@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { updateParticipantPredictions } from "@/lib/admin-actions";
 import { useRouter } from "next/navigation";
 import { getFlag } from "@/lib/flags";
 
@@ -28,14 +27,7 @@ export default function EditUserForm({ user, allMatches }: { user: any, allMatch
 
   const handleSave = async () => {
     setIsSaving(true);
-    const result = await updateParticipantPredictions(user.userId, preds, finals);
-    if (result.success) {
-      alert("✅ Datos guardados correctamente");
-      router.push("/admin");
-      router.refresh();
-    } else {
-      alert("❌ Hubo un error al guardar");
-    }
+    alert("Las predicciones son de solo lectura. Ya no se pueden modificar.");
     setIsSaving(false);
   };
 

@@ -67,11 +67,11 @@ export default function CalendarClient({ participants, matches, results, current
                     </div>
                   </td>
                   <td className="px-2 py-3 md:p-6 text-center font-black text-sm md:text-base font-montserrat border-r border-white/5 bg-white/5 text-white">
-                    {res ? `${res.home}-${res.away}` : '-'}
+                    {res ? `${res.homeGoals}-${res.awayGoals}` : '-'}
                   </td>
                   {filteredParticipants.map((p: any) => {
                     const pred = p.predictions[m.id];
-                    const isExact = res && pred && pred.goles_local === res.home && pred.goles_visitante === res.away;
+                    const isExact = res && pred && pred.goles_local === res.homeGoals && pred.goles_visitante === res.awayGoals;
                     
                     return (
                       <td key={p.userId} className={`px-2 py-3 md:p-6 text-center font-bold text-sm md:text-base transition-all ${isExact ? 'bg-yellow-500/10 text-yellow-500 scale-[0.98]' : 'text-white/40'}`}>

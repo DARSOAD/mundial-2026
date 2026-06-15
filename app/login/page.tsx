@@ -1,22 +1,35 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { getParticipants } from "@/lib/data";
 import LoginClient from "./login-client";
 import { getLoggedInUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
 
-export default async function LoginPage() {
-  const user = await getLoggedInUser();
-  
-  if (user) {
-    redirect("/profile");
-  }
+export default function LoginPage() {
+  const [usersForLogin, setUsersForLogin] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const participants = await getParticipants();
-  
-  // Extraemos solo la info necesaria para el cliente
-  const usersForLogin = participants.map((p: any) => ({
-    userId: p.userId,
-    name: p.name
-  })).sort((a: any, b: any) => a.name.localeCompare(b.name));
+  useEffect(() => {
+    async function load() {
+      const user = await getLoggedInUser();
+      if (user) {
+        window.location.href = '/mundial-2026/profile';
+        return;
+      }
+
+      const participants = await getParticipants();
+      const users = participants.map((p: any) => ({
+        userId: p.userId,
+        name: p.name
+      })).sort((a: any, b: any) => a.name.localeCompare(b.name));
+
+      setUsersForLogin(users);
+      setIsLoading(false);
+    }
+    load();
+  }, []);
+
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-yellow-500 uppercase tracking-widest animate-pulse">Cargando...</div>;
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">

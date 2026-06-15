@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSnapshotData } from "@/lib/data";
+import { getResults, getParticipants } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
 import { getFlag } from "@/lib/flags";
 import { notFound } from "next/navigation";
@@ -13,8 +13,12 @@ export default function MatchDetailClient({ matchId }: { matchId: string }) {
 
   useEffect(() => {
     async function load() {
-      const [snap, m] = await Promise.all([getSnapshotData(), getAllMatches()]);
-      setData(snap);
+      const [results, participants, m] = await Promise.all([
+        getResults(),
+        getParticipants(),
+        getAllMatches()
+      ]);
+      setData({ participants, realResults: results });
       setMatches(m);
       setIsLoading(false);
     }
@@ -26,10 +30,7 @@ export default function MatchDetailClient({ matchId }: { matchId: string }) {
   const match = matches.find(m => m.id === matchId);
   if (!match) return notFound();
 
-  const realResults: Record<string, { home: number, away: number }> = {
-    "mex_saf": { home: 2, away: 0 },
-    "sko_rch": { home: 2, away: 1 }
-  };
+  const realResults = data.realResults || {};
   const result = realResults[matchId];
   const participants = data.participants || [];
 
@@ -43,11 +44,11 @@ export default function MatchDetailClient({ matchId }: { matchId: string }) {
           </div>
           <div className="flex flex-row md:flex-col items-center gap-4 md:gap-2">
             <div className="bg-yellow-500 text-black font-black text-3xl md:text-5xl w-16 h-16 md:w-24 md:h-24 flex items-center justify-center rounded-2xl rotate-3 shadow-2xl shadow-yellow-500/20">
-              {result ? result.home : "-"}
+              {result ? result.homeGoals : "-"}
             </div>
             <span className="text-white/20 font-black tracking-widest text-lg">VS</span>
             <div className="bg-white text-black font-black text-3xl md:text-5xl w-16 h-16 md:w-24 md:h-24 flex items-center justify-center rounded-2xl -rotate-3 shadow-2xl">
-              {result ? result.away : "-"}
+              {result ? result.awayGoals : "-"}
             </div>
           </div>
           <div className="md:text-left flex-1 w-full flex flex-col items-center md:items-start">
@@ -63,7 +64,7 @@ export default function MatchDetailClient({ matchId }: { matchId: string }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {participants.map((p: any) => {
           const pred = p.predictions[matchId];
-          const isExact = result && pred && pred.goles_local === result.home && pred.goles_visitante === result.away;
+          const isExact = result && pred && pred.goles_local === result.homeGoals && pred.goles_visitante === result.awayGoals;
           
           return (
             <div key={p.userId} className={`flex items-center justify-between p-6 rounded-3xl border transition-all duration-500 ${isExact ? 'bg-yellow-500/10 border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.1)] scale-[1.02]' : 'bg-white/5 border-white/5'}`}>

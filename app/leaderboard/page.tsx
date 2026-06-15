@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSnapshotData } from "@/lib/data";
+import { getResults, getParticipants } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
 import { getDetailedPoints, MatchResult } from "@/lib/scoring";
 
@@ -12,8 +12,12 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     async function load() {
-      const [snap, m] = await Promise.all([getSnapshotData(), getAllMatches()]);
-      setData(snap);
+      const [results, participants, m] = await Promise.all([
+        getResults(),
+        getParticipants(),
+        getAllMatches()
+      ]);
+      setData({ participants, realResults: results });
       setMatches(m);
       setIsLoading(false);
     }
@@ -23,10 +27,7 @@ export default function LeaderboardPage() {
   if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-yellow-500 uppercase tracking-widest animate-pulse">Cargando Ranking...</div>;
 
   const participants = data.participants || [];
-  const realResults: Record<string, MatchResult> = {
-    "mex_saf": { homeGoals: 2, awayGoals: 0, status: 'finished' },
-    "sko_rch": { homeGoals: 2, awayGoals: 1, status: 'finished' }
-  };
+  const realResults = data.realResults || {};
 
   const processedParticipants = participants.map((p: any) => {
     const breakdown = {
