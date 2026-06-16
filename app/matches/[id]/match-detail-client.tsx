@@ -13,19 +13,24 @@ export default function MatchDetailClient({ matchId }: { matchId: string }) {
 
   useEffect(() => {
     async function load() {
-      const [results, participants, m] = await Promise.all([
-        getResults(),
-        getParticipants(),
-        getAllMatches()
-      ]);
-      setData({ participants, realResults: results });
-      setMatches(m);
-      setIsLoading(false);
+      try {
+        const [results, participants, m] = await Promise.all([
+          getResults(),
+          getParticipants(),
+          getAllMatches()
+        ]);
+        setData({ participants, realResults: results });
+        setMatches(m);
+      } catch (error) {
+        console.error("Error loading match detail data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     load();
   }, []);
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-yellow-500 uppercase tracking-widest animate-pulse">Cargando Detalle...</div>;
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-yellow-500 uppercase tracking-widest">Cargando Detalle...</div>;
 
   const match = matches.find(m => m.id === matchId);
   if (!match) return notFound();

@@ -14,19 +14,24 @@ export default function HomePage() {
 
   useEffect(() => {
     async function load() {
-      const [results, participants, m] = await Promise.all([
-        getResults(),
-        getParticipants(),
-        getAllMatches()
-      ]);
-      setData({ participants, realResults: results });
-      setMatches(m);
-      setIsLoading(false);
+      try {
+        const [results, participants, m] = await Promise.all([
+          getResults(),
+          getParticipants(),
+          getAllMatches()
+        ]);
+        setData({ participants, realResults: results });
+        setMatches(m);
+      } catch (error) {
+        console.error("Error loading home page data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     load();
   }, []);
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-yellow-500 uppercase tracking-widest animate-pulse text-center p-4">Cargando Mundial 2026...</div>;
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-yellow-500 uppercase tracking-widest text-center p-4">Cargando Mundial 2026...</div>;
 
   const participants = data.participants || [];
   const realResults = data.realResults || {}; // ¡AHORA LEEMOS DEL SNAPSHOT REAL!

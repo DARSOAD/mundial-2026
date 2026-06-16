@@ -4,7 +4,7 @@ const BASE = '/mundial-2026';
 export async function getResults(): Promise<Record<string, any>> {
   try {
     if (typeof window === 'undefined') return {};
-    const res = await fetch(`${BASE}/resultados.json`, { cache: 'no-store' });
+    const res = await fetch(`${BASE}/resultados.json`);
     if (!res.ok) return {};
     return await res.json();
   } catch {
@@ -21,7 +21,7 @@ export async function getParticipants(): Promise<any[]> {
       const filePath = path.join(process.cwd(), 'public', 'predicciones.json');
       raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     } else {
-      const res = await fetch(`${BASE}/predicciones.json`, { cache: 'no-store' });
+      const res = await fetch(`${BASE}/predicciones.json`);
       if (!res.ok) return [];
       raw = await res.json();
     }
@@ -41,7 +41,7 @@ export async function getParticipants(): Promise<any[]> {
 export async function getSystemSettings(): Promise<{ activePhases: string[] }> {
   try {
     if (typeof window === 'undefined') return { activePhases: ["grupos"] };
-    const res = await fetch(`${BASE}/settings.json`, { cache: 'no-store' });
+    const res = await fetch(`${BASE}/settings.json`);
     if (!res.ok) return { activePhases: ["grupos"] };
     return await res.json();
   } catch {
@@ -52,7 +52,7 @@ export async function getSystemSettings(): Promise<{ activePhases: string[] }> {
 export async function getKnockoutMatches(): Promise<any[]> {
   try {
     if (typeof window === 'undefined') return [];
-    const res = await fetch(`${BASE}/eliminatorias.json`, { cache: 'no-store' });
+    const res = await fetch(`${BASE}/eliminatorias.json`);
     if (!res.ok) return [];
     return await res.json();
   } catch {
@@ -63,7 +63,7 @@ export async function getKnockoutMatches(): Promise<any[]> {
 export async function getKnockoutPredictions(): Promise<Record<string, Record<string, any>>> {
   try {
     if (typeof window === 'undefined') return {};
-    const res = await fetch(`${BASE}/predicciones-eliminatorias.json`, { cache: 'no-store' });
+    const res = await fetch(`${BASE}/predicciones-eliminatorias.json`);
     if (!res.ok) return {};
     return await res.json();
   } catch {

@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# dynamic data (managed via admin or user actions)
+public/resultados.json
+public/predicciones.json
+public/predicciones-eliminatorias.json
+public/eliminatorias.json
+public/settings.json

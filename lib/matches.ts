@@ -23,7 +23,8 @@ export async function getAllMatches(): Promise<MatchInfo[]> {
       return mapCalendarData(calendarData);
     }
 
-    const res = await fetch('/mundial-2026/calendario.json', { cache: 'no-store' });
+    const res = await fetch('/mundial-2026/calendario.json');
+    if (!res.ok) throw new Error("Failed to fetch calendario.json");
     const calendarData = await res.json();
     return mapCalendarData(calendarData);
   } catch (error) {
