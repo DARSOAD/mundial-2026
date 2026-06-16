@@ -4,6 +4,38 @@ import { CloudFrontClient, CreateInvalidationCommand } from "@aws-sdk/client-clo
 const s3 = new S3Client({});
 const cf = new CloudFrontClient({});
 
+const PREFIX = "mundial-2026";
+
+async function readJSON(bucket, key) {
+  try {
+    const res = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+    return JSON.parse(await res.Body.transformToString());
+  } catch {
+    return null;
+  }
+}
+
+async function writeJSON(bucket, key, data) {
+  await s3.send(new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    Body: JSON.stringify(data),
+    ContentType: "application/json",
+    CacheControl: "no-cache, no-store, must-revalidate"
+  }));
+}
+
+async function invalidate(distId, paths) {
+  if (!distId) return;
+  await cf.send(new CreateInvalidationCommand({
+    DistributionId: distId,
+    InvalidationBatch: {
+      CallerReference: Date.now().toString(),
+      Paths: { Quantity: paths.length, Items: paths }
+    }
+  }));
+}
+
 export const handler = async (event) => {
   const { BUCKET_NAME, CLOUDFRONT_DISTRIBUTION_ID } = process.env;
   const headers = {
@@ -19,64 +51,93 @@ export const handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || "{}");
-    const { action, userId, results } = body;
+    const { action, userId } = body;
 
-    if (action !== "saveResults") {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown action" }) };
+    // ===================== saveResults (admin only) =====================
+    if (action === "saveResults") {
+      if (userId !== "diego") {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
+      }
+      const { results } = body;
+      if (!results || typeof results !== "object") {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing results" }) };
+      }
+
+      const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/resultados.json`)) || {};
+      const merged = { ...existing, ...results };
+      await writeJSON(BUCKET_NAME, `${PREFIX}/resultados.json`, merged);
+      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/resultados.json`]);
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, results: merged }) };
     }
 
-    if (userId !== "diego") {
-      return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
+    // ===================== saveKnockoutMatches (admin only) =====================
+    // Admin creates/updates knockout match entries
+    // body.matches = [{ id: "16v_1", phase: "16VOS", local: "Mexico", visitante: "Canada", date: "2026-06-28", time: "11:00" }, ...]
+    if (action === "saveKnockoutMatches") {
+      if (userId !== "diego") {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
+      }
+      const { matches } = body;
+      if (!Array.isArray(matches)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing matches array" }) };
+      }
+
+      const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/eliminatorias.json`)) || [];
+      // Merge: update existing by id, add new ones
+      const map = {};
+      existing.forEach(m => { map[m.id] = m; });
+      matches.forEach(m => { map[m.id] = { ...map[m.id], ...m }; });
+      const merged = Object.values(map);
+
+      await writeJSON(BUCKET_NAME, `${PREFIX}/eliminatorias.json`, merged);
+      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/eliminatorias.json`]);
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, matches: merged }) };
     }
 
-    if (!results || typeof results !== "object") {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing results" }) };
+    // ===================== saveKnockoutPrediction (any logged-in user) =====================
+    // body.matchId = "16v_1", body.prediction = { goles_local: 2, goles_visitante: 1, team_passes: "home" }
+    if (action === "saveKnockoutPrediction") {
+      if (!userId) {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
+      }
+      const { matchId, prediction } = body;
+      if (!matchId || !prediction) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing matchId or prediction" }) };
+      }
+
+      const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`)) || {};
+      if (!existing[userId]) existing[userId] = {};
+      existing[userId][matchId] = prediction;
+
+      await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`, existing);
+      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones-eliminatorias.json`]);
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
-    let existing = {};
-    try {
-      const getRes = await s3.send(new GetObjectCommand({
-        Bucket: BUCKET_NAME,
-        Key: "mundial-2026/resultados.json"
-      }));
-      const text = await getRes.Body.transformToString();
-      existing = JSON.parse(text);
-    } catch (e) {
-      // File doesn't exist yet, start fresh
+    // ===================== saveSettings (admin only) =====================
+    // body.settings = { activePhases: ["grupos", "16vos"] }
+    if (action === "saveSettings") {
+      if (userId !== "diego") {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
+      }
+      const { settings } = body;
+      if (!settings) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing settings" }) };
+      }
+
+      await writeJSON(BUCKET_NAME, `${PREFIX}/settings.json`, settings);
+      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/settings.json`]);
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, settings }) };
     }
 
-    const merged = { ...existing, ...results };
-
-    await s3.send(new PutObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: "mundial-2026/resultados.json",
-      Body: JSON.stringify(merged),
-      ContentType: "application/json",
-      CacheControl: "no-cache, no-store, must-revalidate"
-    }));
-
-    if (CLOUDFRONT_DISTRIBUTION_ID) {
-      await cf.send(new CreateInvalidationCommand({
-        DistributionId: CLOUDFRONT_DISTRIBUTION_ID,
-        InvalidationBatch: {
-          CallerReference: Date.now().toString(),
-          Paths: { Quantity: 1, Items: ["/mundial-2026/resultados.json"] }
-        }
-      }));
-    }
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ success: true, results: merged })
-    };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown action" }) };
 
   } catch (error) {
     console.error(error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: error.message })
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
   }
 };

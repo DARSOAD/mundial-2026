@@ -38,6 +38,35 @@ export async function getParticipants(): Promise<any[]> {
   }
 }
 
-export async function getSystemSettings() {
-  return { activePhases: ["grupos"] };
+export async function getSystemSettings(): Promise<{ activePhases: string[] }> {
+  try {
+    if (typeof window === 'undefined') return { activePhases: ["grupos"] };
+    const res = await fetch(`${BASE}/settings.json`, { cache: 'no-store' });
+    if (!res.ok) return { activePhases: ["grupos"] };
+    return await res.json();
+  } catch {
+    return { activePhases: ["grupos"] };
+  }
+}
+
+export async function getKnockoutMatches(): Promise<any[]> {
+  try {
+    if (typeof window === 'undefined') return [];
+    const res = await fetch(`${BASE}/eliminatorias.json`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
+export async function getKnockoutPredictions(): Promise<Record<string, Record<string, any>>> {
+  try {
+    if (typeof window === 'undefined') return {};
+    const res = await fetch(`${BASE}/predicciones-eliminatorias.json`, { cache: 'no-store' });
+    if (!res.ok) return {};
+    return await res.json();
+  } catch {
+    return {};
+  }
 }

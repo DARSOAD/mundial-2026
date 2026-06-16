@@ -10,5 +10,8 @@
   "ale_cur": { "homeGoals": 7, "awayGoals": 1, "status": "finished" },
   "hol_jap": { "homeGoals": 2, "awayGoals": 2, "status": "finished" },
   "cdm_ecu": { "homeGoals": 1, "awayGoals": 0, "status": "finished" },
-  "sue_tun": { "homeGoals": 5, "awayGoals": 1, "status": "finished" }
+  "sue_tun": { "homeGoals": 5, "awayGoals": 1, "status": "finished" },
+  "esp_cve": { "homeGoals": 0, "awayGoals": 0, "status": "finished" },
+  "bel_egi": { "homeGoals": 1, "awayGoals": 1, "status": "finished" },
+  "asa_uru": { "homeGoals": 1, "awayGoals": 1, "status": "finished" }
 }

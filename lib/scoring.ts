@@ -20,6 +20,7 @@ export interface Prediction {
   goles_visitante: number | null;
   local: string;
   visitante: string;
+  team_passes?: 'home' | 'away' | null;
 }
 
 export interface PointsBreakdown {
@@ -56,7 +57,7 @@ export function getDetailedPoints(prediction: Prediction, result: MatchResult): 
     // REGLA ELIMINATORIAS: Acertar quién pasa
     // En eliminatorias no hay empates al final, alguien tiene que pasar (penales/prórroga)
     // El pronóstico asume que quien puso más goles, pasa. (Si pone empate, pierde este punto a menos que hagamos UI para elegir quien pasa en penales, por ahora asumimos que el ganador del pronóstico es el que pasa).
-    let predictionPasses = pLocal > pVisitante ? 'home' : (pLocal < pVisitante ? 'away' : null);
+    let predictionPasses = pLocal > pVisitante ? 'home' : (pLocal < pVisitante ? 'away' : (prediction.team_passes || null));
     
     // Si la predicción es empate, no podemos saber quién cree que pasa en penales
     // a menos que en la UI haya un selector. Por ahora, si predicen empate y no aciertan los goles, sacan 0.

@@ -58,7 +58,10 @@ export default function AdminPage() {
     <div className="max-w-6xl mx-auto py-12 px-4">
       <div className="flex items-center justify-between mb-12">
         <h2 className="text-4xl font-black text-white uppercase font-montserrat">⚙️ Panel Admin</h2>
-        <Link href="/admin/results" className="bg-yellow-500 text-black font-black px-6 py-3 rounded-xl text-xs uppercase">Actualizar Resultados</Link>
+        <div className="flex gap-3">
+          <Link href="/admin/results" className="bg-yellow-500 text-black font-black px-6 py-3 rounded-xl text-xs uppercase">Resultados</Link>
+          <Link href="/admin/knockout" className="bg-red-600 text-white font-black px-6 py-3 rounded-xl text-xs uppercase">Eliminatorias</Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8">
