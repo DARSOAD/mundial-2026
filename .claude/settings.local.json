@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm uninstall:*)",
       "Bash(cd:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(grep -oP '6l8owsz8qb[^\"\"\"\"''''`,; ]{0,80}' \"C:/Users/admin/Desktop/Proyectos Programación/mundial-2026/out/_next/static/chunks/2jeahpv98yavd.js\")"
     ]
   }
 }
