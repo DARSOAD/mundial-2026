@@ -14,6 +14,7 @@ export default function AdminResultsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [originalResults, setOriginalResults] = useState<Record<string, any>>({});
 
   useEffect(() => {
     async function load() {
@@ -25,6 +26,7 @@ export default function AdminResultsPage() {
       const [m, r] = await Promise.all([getAllMatches(), getResults()]);
       setMatches(m);
       setResults(r);
+      setOriginalResults(r);
       setIsLoading(false);
     }
     load();
@@ -47,9 +49,16 @@ export default function AdminResultsPage() {
     setMessage("");
     try {
       const toSave: Record<string, any> = {};
+      // Send current results
       Object.entries(results).forEach(([id, r]: [string, any]) => {
         if (r.homeGoals !== null && r.homeGoals !== undefined && r.awayGoals !== null && r.awayGoals !== undefined) {
           toSave[id] = { homeGoals: r.homeGoals, awayGoals: r.awayGoals, status: r.status || "finished" };
+        }
+      });
+      // Send null for results that were cleared (existed before but not now)
+      Object.keys(originalResults).forEach(id => {
+        if (!toSave[id]) {
+          toSave[id] = null;
         }
       });
 

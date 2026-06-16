@@ -64,7 +64,15 @@ export const handler = async (event) => {
       }
 
       const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/resultados.json`)) || {};
-      const merged = { ...existing, ...results };
+      const merged = { ...existing };
+      // Merge: null values delete the key, objects update it
+      Object.entries(results).forEach(([key, val]) => {
+        if (val === null) {
+          delete merged[key];
+        } else {
+          merged[key] = val;
+        }
+      });
       await writeJSON(BUCKET_NAME, `${PREFIX}/resultados.json`, merged);
       await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/resultados.json`]);
 
