@@ -142,6 +142,35 @@ export const handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, settings }) };
     }
 
+    // ===================== registerUser (Public) =====================
+    if (action === "registerUser") {
+      const { username, password, basePredictions, baseFinals } = body;
+      if (!username || !password) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing username or password" }) };
+      }
+
+      const cleanUserId = username.toLowerCase().trim().replace(/\s+/g, '_');
+      
+      const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`)) || [];
+      if (existing.some(u => u.participante.toLowerCase().replace(/\s+/g, '_') === cleanUserId)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "El usuario ya existe" }) };
+      }
+
+      const newUser = {
+        participante: username,
+        password: password,
+        predicciones_partidos: basePredictions || {},
+        predicciones_finales: baseFinals || {}
+      };
+
+      existing.push(newUser);
+
+      await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`, existing);
+      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones.json`]);
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, userId: cleanUserId }) };
+    }
+
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown action" }) };
 
   } catch (error) {
