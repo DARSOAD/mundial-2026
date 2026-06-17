@@ -76,16 +76,6 @@ export default function LoginClient({ users }: { users: { userId: string, name: 
       >
         {isLoading ? "Entrando..." : "Ingresar a mi perfil"}
       </button>
-
-      <div className="text-center">
-        <button 
-          type="button"
-          onClick={() => window.location.href = "/mundial-2026/register/"}
-          className="text-[10px] text-white/40 font-black uppercase tracking-widest hover:text-white transition-colors"
-        >
-          ¿No tienes cuenta? Regístrate aquí
-        </button>
-      </div>
     </form>
   );
 }

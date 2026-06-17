@@ -142,33 +142,6 @@ export const handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, settings }) };
     }
 
-    // ===================== registerUser (Public) =====================
-    if (action === "registerUser") {
-      const { username, password, basePredictions, baseFinals } = body;
-      if (!username || !password) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing username or password" }) };
-      }
-
-      const cleanUserId = username.toLowerCase().trim().replace(/\s+/g, '_');
-      
-      const existingUsers = (await readJSON(BUCKET_NAME, `${PREFIX}/usuarios.json`)) || {};
-      if (existingUsers[cleanUserId]) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "El usuario ya existe" }) };
-      }
-
-      existingUsers[cleanUserId] = {
-        name: username,
-        password: password,
-        predictions: basePredictions || {},
-        finals: baseFinals || {}
-      };
-
-      await writeJSON(BUCKET_NAME, `${PREFIX}/usuarios.json`, existingUsers);
-      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/usuarios.json`]);
-
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, userId: cleanUserId }) };
-    }
-
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown action" }) };
 
   } catch (error) {

@@ -14,54 +14,26 @@ export async function getResults(): Promise<Record<string, any>> {
 
 export async function getParticipants(): Promise<any[]> {
   try {
-    let raw: any[] = [];
-    let dynamicUsers: Record<string, any> = {};
-    let knockoutPreds: Record<string, Record<string, any>> = {};
-
+    let raw: any[];
     if (typeof window === 'undefined') {
       const fs = require('fs');
       const path = require('path');
       const filePath = path.join(process.cwd(), 'public', 'predicciones.json');
-      if (fs.existsSync(filePath)) {
-        raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      }
+      raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     } else {
-      const [resRaw, resDyn, resKo] = await Promise.all([
-        fetch(`${BASE}/predicciones.json`),
-        fetch(`${BASE}/usuarios.json`),
-        fetch(`${BASE}/predicciones-eliminatorias.json`)
-      ]);
-      
-      if (resRaw.ok) raw = await resRaw.json();
-      if (resDyn.ok) dynamicUsers = await resDyn.json();
-      if (resKo.ok) knockoutPreds = await resKo.json();
+      const res = await fetch(`${BASE}/predicciones.json`);
+      if (!res.ok) return [];
+      raw = await res.json();
     }
 
-    const participants = raw.map((p: any) => {
-      const userId = p.participante.toLowerCase().replace(/\s+/g, '_');
-      return {
-        userId,
-        name: p.participante,
-        password: p.password || "1234",
-        predictions: { ...(p.predicciones_partidos || {}), ...(knockoutPreds[userId] || {}) },
-        finals: p.predicciones_finales || {}
-      };
-    });
-
-    // Add dynamic users
-    Object.entries(dynamicUsers).forEach(([userId, u]: [string, any]) => {
-      participants.push({
-        userId,
-        name: u.name,
-        password: u.password,
-        predictions: { ...(u.predictions || {}), ...(knockoutPreds[userId] || {}) },
-        finals: u.finals || {}
-      });
-    });
-
-    return participants;
-  } catch (error) {
-    console.error("Error loading participants:", error);
+    return raw.map((p: any) => ({
+      userId: p.participante.toLowerCase().replace(/\s+/g, '_'),
+      name: p.participante,
+      password: p.password || "1234",
+      predictions: p.predicciones_partidos || {},
+      finals: p.predicciones_finales || {}
+    }));
+  } catch {
     return [];
   }
 }
