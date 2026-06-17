@@ -11,7 +11,7 @@ export default function RegisterPage() {
     async function checkAuth() {
       const user = await getLoggedInUser();
       if (user) {
-        window.location.href = '/mundial-2026/profile';
+        window.location.href = '/mundial-2026/profile/';
         return;
       }
       setIsLoading(false);
