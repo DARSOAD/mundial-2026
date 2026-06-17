@@ -37,9 +37,8 @@ jobs:
 
       - name: Sync files to S3 bucket
         run: |
-          # Sincronizamos la carpeta out a la subcarpeta mundial-2026 en S3 para que diegoan.com/mundial-2026 funcione
-          # Excluimos los archivos JSON dinámicos para que no se borren ni se sobreescriban en S3
-          aws s3 sync out/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/mundial-2026/ --delete \
+          # Sincronizamos el contenido de out/mundial-2026 (generado por basePath) hacia la carpeta destino en S3
+          aws s3 sync out/mundial-2026/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/mundial-2026/ --delete \
             --exclude "resultados.json" \
             --exclude "predicciones.json" \
             --exclude "predicciones-eliminatorias.json" \
