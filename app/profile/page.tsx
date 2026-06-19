@@ -21,7 +21,7 @@ export default function ProfilePage() {
       ]);
 
       if (!u) {
-        window.location.href = '/mundial-2026/login';
+        window.location.href = '/mundial-2026/login/';
         return;
       }
 
