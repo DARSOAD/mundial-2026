@@ -74,7 +74,7 @@ export default function AdminPage() {
                   <p className="font-bold">{u.name}</p>
                   <p className="text-[10px] text-white/40 uppercase">Partidos: {u.missingMatches} faltantes | Finales: {u.missingFinals} faltantes</p>
                 </div>
-                <Link href={`/admin/edit/${u.userId}`} className="bg-white/10 px-4 py-2 rounded-lg font-bold text-[10px] uppercase">Editar</Link>
+                <Link href={`/admin/edit/?id=${u.userId}`} className="bg-white/10 px-4 py-2 rounded-lg font-bold text-[10px] uppercase">Editar</Link>
               </div>
             ))}
           </div>
