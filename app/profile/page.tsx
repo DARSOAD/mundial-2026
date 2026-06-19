@@ -3,21 +3,23 @@
 import { useEffect, useState } from "react";
 import { getLoggedInUser } from "@/lib/auth";
 import { getAllMatches } from "@/lib/matches";
-import { getSystemSettings } from "@/lib/data";
+import { getSystemSettings, getResults } from "@/lib/data";
 import ProfileClient from "./profile-client";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
   const [matches, setMatches] = useState<any[]>([]);
   const [activePhases, setActivePhases] = useState<string[]>([]);
+  const [results, setResults] = useState<Record<string, any>>({});
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [u, m, settings] = await Promise.all([
+      const [u, m, settings, res] = await Promise.all([
         getLoggedInUser(),
         getAllMatches(),
-        getSystemSettings()
+        getSystemSettings(),
+        getResults()
       ]);
 
       if (!u) {
@@ -28,6 +30,7 @@ export default function ProfilePage() {
       setUser(u);
       setMatches(m);
       setActivePhases(settings?.activePhases || ["grupos"]);
+      setResults(res || {});
       setIsLoading(false);
     }
     load();
@@ -44,7 +47,7 @@ export default function ProfilePage() {
         <p className="text-white/40 font-bold uppercase text-[10px] tracking-[0.2em] mt-2">Bienvenido a tu panel de pronósticos</p>
       </div>
 
-      <ProfileClient user={user} allMatches={matches} activePhases={activePhases} />
+      <ProfileClient user={user} allMatches={matches} activePhases={activePhases} results={results} />
     </div>
   );
 }

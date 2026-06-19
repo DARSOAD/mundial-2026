@@ -125,6 +125,80 @@ export const handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
+    // ===================== saveUserPredictions (any logged-in user, only once) =====================
+    if (action === "saveUserPredictions") {
+      if (!userId) {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
+      }
+      const { predictions } = body;
+      if (!predictions || typeof predictions !== "object") {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing predictions" }) };
+      }
+
+      const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`)) || [];
+      const userIndex = existing.findIndex(u => u.participante.toLowerCase().replace(/\s+/g, '_') === userId);
+      if (userIndex === -1) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: "Usuario no encontrado" }) };
+      }
+
+      const user = existing[userIndex];
+
+      if (user.predictions_edited) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Ya has modificado tus pronósticos una vez y están bloqueados." }) };
+      }
+
+      const calendar = (await readJSON(BUCKET_NAME, `${PREFIX}/calendario.json`)) || [];
+      const results = (await readJSON(BUCKET_NAME, `${PREFIX}/resultados.json`)) || {};
+      const now = Date.now();
+
+      if (!user.predicciones_partidos) user.predicciones_partidos = {};
+
+      for (const [matchId, predVal] of Object.entries(predictions)) {
+        if (!predVal || typeof predVal !== "object") continue;
+        
+        const match = calendar.find(m => m.pred_id === matchId);
+        if (!match) continue;
+
+        const res = results[matchId];
+        const hasResult = res && res.homeGoals != null && res.awayGoals != null;
+
+        let hasPassed = hasResult;
+        if (!hasPassed && match.date && match.time_colombia) {
+          try {
+            const matchDateTimeStr = `${match.date}T${match.time_colombia}:00-05:00`;
+            const matchTime = new Date(matchDateTimeStr).getTime();
+            if (now >= matchTime) {
+              hasPassed = true;
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        if (hasPassed) {
+          continue; // skip updating past matches
+        }
+
+        if (!user.predicciones_partidos[matchId]) {
+          user.predicciones_partidos[matchId] = {
+            local: match.team_home || match.local,
+            visitante: match.team_away || match.visitante
+          };
+        }
+        
+        user.predicciones_partidos[matchId].goles_local = predVal.goles_local;
+        user.predicciones_partidos[matchId].goles_visitante = predVal.goles_visitante;
+      }
+
+      user.predictions_edited = true;
+      existing[userIndex] = user;
+
+      await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`, existing);
+      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones.json`]);
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
     // ===================== saveSettings (admin only) =====================
     // body.settings = { activePhases: ["grupos", "16vos"] }
     if (action === "saveSettings") {

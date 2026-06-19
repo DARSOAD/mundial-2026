@@ -50,7 +50,8 @@ export async function getParticipants(): Promise<any[]> {
         name: p.participante,
         password: p.password || "1234",
         predictions: { ...(p.predicciones_partidos || {}), ...(knockoutPreds[userId] || {}) },
-        finals: p.predicciones_finales || {}
+        finals: p.predicciones_finales || {},
+        predictions_edited: p.predictions_edited || false
       };
     });
   } catch (error) {
