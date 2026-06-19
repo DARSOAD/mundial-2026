@@ -4,7 +4,7 @@ const BASE = '/mundial-2026';
 export async function getResults(): Promise<Record<string, any>> {
   try {
     if (typeof window === 'undefined') return {};
-    const res = await fetch(`${BASE}/resultados.json`);
+    const res = await fetch(`${BASE}/resultados.json?t=${Date.now()}`);
     if (!res.ok) return {};
     return await res.json();
   } catch {
@@ -25,9 +25,10 @@ export async function getParticipants(): Promise<any[]> {
         raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
       }
     } else {
+      const timestamp = Date.now();
       const [resRaw, resKo] = await Promise.all([
-        fetch(`${BASE}/predicciones.json`),
-        fetch(`${BASE}/predicciones-eliminatorias.json`).catch(() => null)
+        fetch(`${BASE}/predicciones.json?t=${timestamp}`),
+        fetch(`${BASE}/predicciones-eliminatorias.json?t=${timestamp}`).catch(() => null)
       ]);
       
       if (resRaw && resRaw.ok) {
@@ -61,7 +62,7 @@ export async function getParticipants(): Promise<any[]> {
 export async function getSystemSettings(): Promise<{ activePhases: string[] }> {
   try {
     if (typeof window === 'undefined') return { activePhases: ["grupos"] };
-    const res = await fetch(`${BASE}/settings.json`);
+    const res = await fetch(`${BASE}/settings.json?t=${Date.now()}`);
     if (!res.ok) return { activePhases: ["grupos"] };
     return await res.json();
   } catch {
@@ -72,7 +73,7 @@ export async function getSystemSettings(): Promise<{ activePhases: string[] }> {
 export async function getKnockoutMatches(): Promise<any[]> {
   try {
     if (typeof window === 'undefined') return [];
-    const res = await fetch(`${BASE}/eliminatorias.json`);
+    const res = await fetch(`${BASE}/eliminatorias.json?t=${Date.now()}`);
     if (!res.ok) return [];
     return await res.json();
   } catch {
@@ -83,7 +84,7 @@ export async function getKnockoutMatches(): Promise<any[]> {
 export async function getKnockoutPredictions(): Promise<Record<string, Record<string, any>>> {
   try {
     if (typeof window === 'undefined') return {};
-    const res = await fetch(`${BASE}/predicciones-eliminatorias.json`);
+    const res = await fetch(`${BASE}/predicciones-eliminatorias.json?t=${Date.now()}`);
     if (!res.ok) return {};
     return await res.json();
   } catch {
