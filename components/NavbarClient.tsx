@@ -22,6 +22,7 @@ export default function NavbarClient({ user }: { user: any }) {
           <Link href="/" className="hover:text-yellow-500 transition-colors">Home</Link>
           <Link href="/leaderboard" className="hover:text-yellow-500 transition-colors">Ranking</Link>
           <Link href="/calendar" className="hover:text-yellow-500 transition-colors">Calendario</Link>
+          <Link href="/groups" className="hover:text-yellow-500 transition-colors">Grupos</Link>
           <Link href="/bracket" className="hover:text-yellow-500 transition-colors text-yellow-500">🏆 Eliminatorias</Link>
           
           <span className="text-white/10">|</span>
@@ -66,6 +67,7 @@ export default function NavbarClient({ user }: { user: any }) {
             <Link href="/" onClick={() => setIsOpen(false)} className="hover:text-yellow-500 border-b border-white/5 pb-2">Home</Link>
             <Link href="/leaderboard" onClick={() => setIsOpen(false)} className="hover:text-yellow-500 border-b border-white/5 pb-2">Ranking Oficial</Link>
             <Link href="/calendar" onClick={() => setIsOpen(false)} className="hover:text-yellow-500 border-b border-white/5 pb-2">Calendario y Predicciones</Link>
+            <Link href="/groups" onClick={() => setIsOpen(false)} className="hover:text-yellow-500 border-b border-white/5 pb-2">Grupos de Fase de Grupos</Link>
             <Link href="/bracket" onClick={() => setIsOpen(false)} className="text-yellow-500 border-b border-white/5 pb-2">🏆 Llaves Eliminatorias</Link>
           </div>
           

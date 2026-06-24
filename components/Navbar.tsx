@@ -31,6 +31,7 @@ export default function Navbar() {
             <Link href="/" className="hover:text-yellow-500 transition-colors">Home</Link>
             <Link href="/leaderboard" className="hover:text-yellow-500 transition-colors">Ranking</Link>
             <Link href="/calendar" className="hover:text-yellow-500 transition-colors">Calendario</Link>
+            <Link href="/groups" className="hover:text-yellow-500 transition-colors">Grupos</Link>
             <Link href="/bracket" className="hover:text-yellow-500 transition-colors text-yellow-500">🏆 Eliminatorias</Link>
             
             <span className="text-white/10">|</span>

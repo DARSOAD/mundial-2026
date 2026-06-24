@@ -1,277 +1,40 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
-import { CloudFrontClient, CreateInvalidationCommand } from "@aws-sdk/client-cloudfront";
+// lib/bracket-utils.ts
 
-const s3 = new S3Client({});
-const cf = new CloudFrontClient({});
-
-const PREFIX = "mundial-2026";
-
-async function readJSON(bucket, key) {
-  try {
-    const res = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
-    return JSON.parse(await res.Body.transformToString());
-  } catch {
-    return null;
-  }
+export interface TeamStats {
+  name: string;
+  group: string;
+  pj: number;
+  pts: number;
+  gf: number;
+  gc: number;
+  dg: number;
 }
 
-async function writeJSON(bucket, key, data) {
-  await s3.send(new PutObjectCommand({
-    Bucket: bucket,
-    Key: key,
-    Body: JSON.stringify(data),
-    ContentType: "application/json",
-    CacheControl: "no-cache, no-store, must-revalidate"
-  }));
+export interface GroupStanding {
+  group: string;
+  teams: TeamStats[];
 }
 
-async function invalidate(distId, paths) {
-  if (!distId) return;
-  await cf.send(new CreateInvalidationCommand({
-    DistributionId: distId,
-    InvalidationBatch: {
-      CallerReference: Date.now().toString(),
-      Paths: { Quantity: paths.length, Items: paths }
-    }
-  }));
+export interface ThirdsSlotAssignment {
+  slotId: string;
+  slotName: string;
+  team: TeamStats;
 }
 
-export const handler = async (event) => {
-  const { BUCKET_NAME, CLOUDFRONT_DISTRIBUTION_ID } = process.env;
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Content-Type": "application/json"
-  };
-
-  if (event.requestContext?.http?.method === "OPTIONS") {
-    return { statusCode: 200, headers, body: "" };
-  }
-
-  try {
-    const body = JSON.parse(event.body || "{}");
-    const { action, userId } = body;
-
-    // ===================== saveResults (admin only) =====================
-    if (action === "saveResults") {
-      if (userId !== "diego") {
-        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
-      }
-      const { results } = body;
-      if (!results || typeof results !== "object") {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing results" }) };
-      }
-
-      const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/resultados.json`)) || {};
-      const merged = { ...existing };
-      // Merge: null values delete the key, objects update it
-      Object.entries(results).forEach(([key, val]) => {
-        if (val === null) {
-          delete merged[key];
-        } else {
-          merged[key] = val;
-        }
-      });
-      await writeJSON(BUCKET_NAME, `${PREFIX}/resultados.json`, merged);
-      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/resultados.json`]);
-
-      // --- AUTOMATIC STANDINGS & BRACKET CALCULATION ---
-      try {
-        const calendario = (await readJSON(BUCKET_NAME, `${PREFIX}/calendario.json`)) || [];
-        const existingKnockoutMatches = (await readJSON(BUCKET_NAME, `${PREFIX}/eliminatorias.json`)) || [];
-        const updatedKnockout = computeKnockoutBracket(calendario, merged, existingKnockoutMatches);
-        
-        await writeJSON(BUCKET_NAME, `${PREFIX}/eliminatorias.json`, updatedKnockout);
-        await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/eliminatorias.json`]);
-      } catch (err) {
-        console.error("Error updating bracket automatically:", err);
-      }
-      // --- END AUTOMATIC BRACKET CALCULATION ---
-
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, results: merged }) };
-    }
-
-    // ===================== saveKnockoutMatches (admin only) =====================
-    // Admin creates/updates knockout match entries
-    // body.matches = [{ id: "16v_1", phase: "16VOS", local: "Mexico", visitante: "Canada", date: "2026-06-28", time: "11:00" }, ...]
-    if (action === "saveKnockoutMatches") {
-      if (userId !== "diego") {
-        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
-      }
-      const { matches } = body;
-      if (!Array.isArray(matches)) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing matches array" }) };
-      }
-
-      const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/eliminatorias.json`)) || [];
-      // Merge: update existing by id, add new ones
-      const map = {};
-      existing.forEach(m => { map[m.id] = m; });
-      matches.forEach(m => { map[m.id] = { ...map[m.id], ...m }; });
-      const merged = Object.values(map);
-
-      await writeJSON(BUCKET_NAME, `${PREFIX}/eliminatorias.json`, merged);
-      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/eliminatorias.json`]);
-
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, matches: merged }) };
-    }
-
-    // ===================== saveKnockoutPrediction (any logged-in user) =====================
-    // body.matchId = "16v_1", body.prediction = { goles_local: 2, goles_visitante: 1, team_passes: "home" }
-    if (action === "saveKnockoutPrediction") {
-      if (!userId) {
-        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
-      }
-      const { matchId, prediction } = body;
-      if (!matchId || !prediction) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing matchId or prediction" }) };
-      }
-
-      const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`)) || {};
-      if (!existing[userId]) existing[userId] = {};
-      existing[userId][matchId] = prediction;
-
-      await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`, existing);
-      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones-eliminatorias.json`]);
-
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
-    }
-
-    // ===================== saveUserPredictions (any logged-in user, only once) =====================
-    if (action === "saveUserPredictions") {
-      if (!userId) {
-        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
-      }
-      const { predictions } = body;
-      if (!predictions || typeof predictions !== "object") {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing predictions" }) };
-      }
-
-      const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`)) || [];
-      const userIndex = existing.findIndex(u => u.participante.toLowerCase().replace(/\s+/g, '_') === userId);
-      if (userIndex === -1) {
-        return { statusCode: 404, headers, body: JSON.stringify({ error: "Usuario no encontrado" }) };
-      }
-
-      const user = existing[userIndex];
-
-      if (user.predictions_edited) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "Ya has modificado tus pronósticos una vez y están bloqueados." }) };
-      }
-
-      const calendar = (await readJSON(BUCKET_NAME, `${PREFIX}/calendario.json`)) || [];
-      const results = (await readJSON(BUCKET_NAME, `${PREFIX}/resultados.json`)) || {};
-      const now = Date.now();
-
-      if (!user.predicciones_partidos) user.predicciones_partidos = {};
-
-      for (const [matchId, predVal] of Object.entries(predictions)) {
-        if (!predVal || typeof predVal !== "object") continue;
-        
-        const match = calendar.find(m => m.pred_id === matchId);
-        if (!match) continue;
-
-        const res = results[matchId];
-        const hasResult = res && res.homeGoals != null && res.awayGoals != null;
-
-        let hasPassed = hasResult;
-        if (!hasPassed && match.date && match.time_colombia) {
-          try {
-            const matchDateTimeStr = `${match.date}T${match.time_colombia}:00-05:00`;
-            const matchTime = new Date(matchDateTimeStr).getTime();
-            if (now >= matchTime) {
-              hasPassed = true;
-            }
-          } catch (e) {
-            // ignore
-          }
-        }
-
-        if (hasPassed) {
-          continue; // skip updating past matches
-        }
-
-        if (!user.predicciones_partidos[matchId]) {
-          user.predicciones_partidos[matchId] = {
-            local: match.team_home || match.local,
-            visitante: match.team_away || match.visitante
-          };
-        }
-        
-        user.predicciones_partidos[matchId].goles_local = predVal.goles_local;
-        user.predicciones_partidos[matchId].goles_visitante = predVal.goles_visitante;
-      }
-
-      user.predictions_edited = true;
-      existing[userIndex] = user;
-
-      await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`, existing);
-      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones.json`]);
-
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
-    }
-
-    // ===================== saveSettings (admin only) =====================
-    // body.settings = { activePhases: ["grupos", "16vos"] }
-    if (action === "saveSettings") {
-      if (userId !== "diego") {
-        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
-      }
-      const { settings } = body;
-      if (!settings) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing settings" }) };
-      }
-
-      await writeJSON(BUCKET_NAME, `${PREFIX}/settings.json`, settings);
-      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/settings.json`]);
-
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, settings }) };
-    }
-
-    // ===================== registerUser (Public) =====================
-    if (action === "registerUser") {
-      const { username, password, basePredictions, baseFinals } = body;
-      if (!username || !password) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing username or password" }) };
-      }
-
-      const cleanUserId = username.toLowerCase().trim().replace(/\s+/g, '_');
-      
-      const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`)) || [];
-      if (existing.some(u => u.participante.toLowerCase().replace(/\s+/g, '_') === cleanUserId)) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "El usuario ya existe" }) };
-      }
-
-      const newUser = {
-        participante: username,
-        password: password,
-        predicciones_partidos: basePredictions || {},
-        predicciones_finales: baseFinals || {}
-      };
-
-      existing.push(newUser);
-
-      await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`, existing);
-      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones.json`]);
-
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, userId: cleanUserId }) };
-    }
-
-    return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown action" }) };
-
-  } catch (error) {
-    console.error(error);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
-  }
-};
-
-// ===================== BRACKET COMPUTATION HELPERS =====================
-
-function resolveTiesRecursively(teamsList, groupMatches, resultados, generalStats) {
+/**
+ * Resuelve los empates en puntos de manera recursiva basándose en criterios H2H (1-3)
+ * y luego cae en criterios generales del grupo (4 y 5) en caso de persistir el empate.
+ */
+function resolveTiesRecursively(
+  teamsList: string[],
+  groupMatches: any[],
+  resultados: Record<string, any>,
+  generalStats: Record<string, TeamStats>
+): string[] {
   if (teamsList.length <= 1) return teamsList;
 
-  const h2hStats = {};
+  // 1. Calcular estadísticas de enfrentamiento directo (H2H) para este subgrupo de equipos
+  const h2hStats: Record<string, { pts: number; gd: number; gs: number }> = {};
   teamsList.forEach(t => {
     h2hStats[t] = { pts: 0, gd: 0, gs: 0 };
   });
@@ -285,6 +48,7 @@ function resolveTiesRecursively(teamsList, groupMatches, resultados, generalStat
     const localTeam = homeIsLocal ? m.team_home : m.team_away;
     const awayTeam = homeIsLocal ? m.team_away : m.team_home;
 
+    // Solo contamos el partido si ambos equipos están en el subgrupo de empatados
     if (teamsList.includes(localTeam) && teamsList.includes(awayTeam)) {
       const homeGoals = result.homeGoals;
       const awayGoals = result.awayGoals;
@@ -305,7 +69,8 @@ function resolveTiesRecursively(teamsList, groupMatches, resultados, generalStat
     }
   });
 
-  const byH2hPts = {};
+  // 2. Agrupar por puntos H2H (Criterio 1)
+  const byH2hPts: Record<number, string[]> = {};
   teamsList.forEach(t => {
     const pts = h2hStats[t].pts;
     if (!byH2hPts[pts]) byH2hPts[pts] = [];
@@ -314,15 +79,17 @@ function resolveTiesRecursively(teamsList, groupMatches, resultados, generalStat
 
   const sortedH2hPtsKeys = Object.keys(byH2hPts).map(Number).sort((a, b) => b - a);
 
+  // Si los puntos H2H rompieron el empate total o parcialmente
   if (sortedH2hPtsKeys.length > 1) {
-    let result = [];
+    let result: string[] = [];
     sortedH2hPtsKeys.forEach(key => {
       result = result.concat(resolveTiesRecursively(byH2hPts[key], groupMatches, resultados, generalStats));
     });
     return result;
   }
 
-  const byH2hGd = {};
+  // 3. Agrupar por Diferencia de Goles H2H (Criterio 2)
+  const byH2hGd: Record<number, string[]> = {};
   teamsList.forEach(t => {
     const gd = h2hStats[t].gd;
     if (!byH2hGd[gd]) byH2hGd[gd] = [];
@@ -332,14 +99,15 @@ function resolveTiesRecursively(teamsList, groupMatches, resultados, generalStat
   const sortedH2hGdKeys = Object.keys(byH2hGd).map(Number).sort((a, b) => b - a);
 
   if (sortedH2hGdKeys.length > 1) {
-    let result = [];
+    let result: string[] = [];
     sortedH2hGdKeys.forEach(key => {
       result = result.concat(resolveTiesRecursively(byH2hGd[key], groupMatches, resultados, generalStats));
     });
     return result;
   }
 
-  const byH2hGs = {};
+  // 4. Agrupar por Goles Anotados H2H (Criterio 3)
+  const byH2hGs: Record<number, string[]> = {};
   teamsList.forEach(t => {
     const gs = h2hStats[t].gs;
     if (!byH2hGs[gs]) byH2hGs[gs] = [];
@@ -349,28 +117,42 @@ function resolveTiesRecursively(teamsList, groupMatches, resultados, generalStat
   const sortedH2hGsKeys = Object.keys(byH2hGs).map(Number).sort((a, b) => b - a);
 
   if (sortedH2hGsKeys.length > 1) {
-    let result = [];
+    let result: string[] = [];
     sortedH2hGsKeys.forEach(key => {
       result = result.concat(resolveTiesRecursively(byH2hGs[key], groupMatches, resultados, generalStats));
     });
     return result;
   }
 
+  // 5. Criterios Generales del Grupo (Criterios 4 y 5) + Fallback Alfabético
   const sortedByGeneral = [...teamsList].sort((a, b) => {
+    // 4. Mejor diferencia de goles general
     if (generalStats[b].dg !== generalStats[a].dg) {
       return generalStats[b].dg - generalStats[a].dg;
     }
+    // 5. Mayor cantidad de goles general
     if (generalStats[b].gf !== generalStats[a].gf) {
       return generalStats[b].gf - generalStats[a].gf;
     }
+    // Desempate por nombre (para mantener el orden consistente)
     return a.localeCompare(b);
   });
 
   return sortedByGeneral;
 }
 
-function sortGroupStandings(groupName, teams, groupMatches, resultados, generalStats) {
-  const groupsByPoints = {};
+/**
+ * Ordena los equipos de un grupo específico
+ */
+export function sortGroupStandings(
+  groupName: string,
+  teams: string[],
+  groupMatches: any[],
+  resultados: Record<string, any>,
+  generalStats: Record<string, TeamStats>
+): TeamStats[] {
+  // Agrupar a los 4 equipos por sus puntos generales
+  const groupsByPoints: Record<number, string[]> = {};
   teams.forEach(team => {
     const pts = generalStats[team].pts;
     if (!groupsByPoints[pts]) groupsByPoints[pts] = [];
@@ -379,7 +161,7 @@ function sortGroupStandings(groupName, teams, groupMatches, resultados, generalS
 
   const sortedPointsKeys = Object.keys(groupsByPoints).map(Number).sort((a, b) => b - a);
 
-  let finalSortedTeams = [];
+  let finalSortedTeams: string[] = [];
   sortedPointsKeys.forEach(pts => {
     const tied = groupsByPoints[pts];
     const resolved = resolveTiesRecursively(tied, groupMatches, resultados, generalStats);
@@ -389,12 +171,16 @@ function sortGroupStandings(groupName, teams, groupMatches, resultados, generalS
   return finalSortedTeams.map(t => generalStats[t]);
 }
 
-function getStandingsAndQualified(calendario, resultados) {
-  const groupTeams = {};
-  const groupMatches = {};
+/**
+ * Calcula la tabla de posiciones general de los grupos y determina los clasificados
+ */
+export function getStandingsAndQualified(calendario: any[], resultados: Record<string, any>) {
+  const groupTeams: Record<string, string[]> = {};
+  const groupMatches: Record<string, any[]> = {};
   
   calendario.forEach(m => {
     if (m.group) {
+      // Filtrar partidos que pertenezcan a fase de grupos
       const isKnockout = ["16VOS", "OCTAVOS", "CUARTOS", "SEMIS", "FINAL"].includes(m.group.toUpperCase());
       if (!isKnockout) {
         if (!groupTeams[m.group]) {
@@ -408,7 +194,8 @@ function getStandingsAndQualified(calendario, resultados) {
     }
   });
 
-  const generalStats = {};
+  // Inicializar estadísticas generales
+  const generalStats: Record<string, TeamStats> = {};
   for (const groupName in groupTeams) {
     groupTeams[groupName].forEach(teamName => {
       generalStats[teamName] = {
@@ -423,6 +210,7 @@ function getStandingsAndQualified(calendario, resultados) {
     });
   }
 
+  // Calcular goles e información general de cada partido
   calendario.forEach(m => {
     const result = resultados[m.pred_id];
     if (!result || result.status !== 'finished' || result.homeGoals == null || result.awayGoals == null) {
@@ -461,12 +249,13 @@ function getStandingsAndQualified(calendario, resultados) {
     generalStats[teamName].dg = generalStats[teamName].gf - generalStats[teamName].gc;
   }
 
-  const standings = {};
-  const qualified1st = {};
-  const qualified2nd = {};
-  const thirds = [];
+  // Ordenar grupos y extraer clasificados
+  const standings: Record<string, TeamStats[]> = {};
+  const qualified1st: Record<string, TeamStats> = {};
+  const qualified2nd: Record<string, TeamStats> = {};
+  const thirds: TeamStats[] = [];
 
-  const groupNames = Object.keys(groupTeams).sort();
+  const groupNames = Object.keys(groupTeams).sort(); // A, B, C, D, E, F, G, H, I, J, K, L
   groupNames.forEach(groupName => {
     const sorted = sortGroupStandings(groupName, groupTeams[groupName], groupMatches[groupName], resultados, generalStats);
     standings[groupName] = sorted;
@@ -476,6 +265,7 @@ function getStandingsAndQualified(calendario, resultados) {
     if (sorted[2]) thirds.push(sorted[2]);
   });
 
+  // Ordenar la tabla de terceros (Solo criterios generales)
   thirds.sort((a, b) => {
     if (b.pts !== a.pts) return b.pts - a.pts;
     if (b.dg !== a.dg) return b.dg - a.dg;
@@ -494,7 +284,10 @@ function getStandingsAndQualified(calendario, resultados) {
   };
 }
 
-function assignThirdsToSlots(bestThirds) {
+/**
+ * Asigna los 8 mejores terceros a las llaves usando Backtracking
+ */
+export function assignThirdsToSlots(bestThirds: TeamStats[]): ThirdsSlotAssignment[] | null {
   const slots = [
     { id: "16v_2", name: "1E", allowed: ["A", "B", "C", "D", "F"] },
     { id: "16v_5", name: "1I", allowed: ["C", "D", "F", "G", "H"] },
@@ -509,7 +302,7 @@ function assignThirdsToSlots(bestThirds) {
   const assignment = new Array(slots.length).fill(null);
   const used = new Array(bestThirds.length).fill(false);
 
-  function backtrack(slotIdx) {
+  function backtrack(slotIdx: number): boolean {
     if (slotIdx === slots.length) return true;
 
     const slot = slots[slotIdx];
@@ -520,6 +313,7 @@ function assignThirdsToSlots(bestThirds) {
           used[i] = true;
           assignment[slotIdx] = team;
           if (backtrack(slotIdx + 1)) return true;
+          // Backtrack
           used[i] = false;
           assignment[slotIdx] = null;
         }
@@ -539,7 +333,10 @@ function assignThirdsToSlots(bestThirds) {
   return null;
 }
 
-function assignThirdsWithFallback(bestThirds) {
+/**
+ * Asignador con fallback para asegurar que siempre retorne resultados válidos
+ */
+export function assignThirdsWithFallback(bestThirds: TeamStats[]): ThirdsSlotAssignment[] {
   const result = assignThirdsToSlots(bestThirds);
   if (result) return result;
 
@@ -554,8 +351,8 @@ function assignThirdsWithFallback(bestThirds) {
     { id: "16v_15", name: "1K", allowed: ["D", "E", "I", "J", "L"] }
   ];
 
-  const matched = [];
-  const assignedThirds = new Set();
+  const matched: ThirdsSlotAssignment[] = [];
+  const assignedThirds = new Set<string>();
 
   slots.forEach(slot => {
     const match = bestThirds.find(t => slot.allowed.includes(t.group) && !assignedThirds.has(t.name));
@@ -571,7 +368,7 @@ function assignThirdsWithFallback(bestThirds) {
         matched.push({
           slotId: slot.id,
           slotName: slot.name,
-          team: { name: `3° ${slot.allowed.join('/')}`, group: '?' }
+          team: { name: `3° ${slot.allowed.join('/')}`, group: '?', pj: 0, pts: 0, gf: 0, gc: 0, dg: 0 }
         });
       }
     }
@@ -580,16 +377,26 @@ function assignThirdsWithFallback(bestThirds) {
   return matched;
 }
 
-function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches) {
+/**
+ * Calcula y propaga todo el árbol del bracket de eliminación directa
+ */
+export function computeKnockoutBracket(
+  calendario: any[],
+  resultados: Record<string, any>,
+  existingKnockoutMatches: any[]
+): any[] {
+  // 1. Obtener standing y clasificados
   const { qualified1st, qualified2nd, bestThirds } = getStandingsAndQualified(calendario, resultados);
 
+  // 2. Resolver asignaciones de mejores terceros a cada llave de 16vos
   const thirdsAssignments = assignThirdsWithFallback(bestThirds);
-  const thirdsBySlotId = {};
+  const thirdsBySlotId: Record<string, TeamStats> = {};
   thirdsAssignments.forEach(a => {
     thirdsBySlotId[a.slotId] = a.team;
   });
 
-  const r32Sources = {
+  // 3. Orígenes fijos de 16vos (Round of 32)
+  const r32Sources: Record<string, { local: () => string; visitante: () => string }> = {
     "16v_1": {
       local: () => qualified2nd["A"]?.name || "2° Grupo A",
       visitante: () => qualified2nd["B"]?.name || "2° Grupo B"
@@ -656,8 +463,11 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
     }
   };
 
-  function createDefaultMatches() {
-    const list = [];
+  // Helper para inicializar partidos por defecto si no existen
+  function createDefaultMatches(): any[] {
+    const list: any[] = [];
+    
+    // 16vos
     for (let i = 1; i <= 16; i++) {
       list.push({
         id: `16v_${i}`,
@@ -669,6 +479,8 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
         time: `${12 + (i % 4) * 3}:00`
       });
     }
+
+    // Octavos
     for (let i = 1; i <= 8; i++) {
       list.push({
         id: `8v_${i}`,
@@ -680,6 +492,8 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
         time: `${12 + (i % 2) * 4}:00`
       });
     }
+
+    // Cuartos
     for (let i = 1; i <= 4; i++) {
       list.push({
         id: `4v_${i}`,
@@ -691,6 +505,8 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
         time: `${14 + (i % 2) * 4}:00`
       });
     }
+
+    // Semis
     for (let i = 1; i <= 2; i++) {
       list.push({
         id: `sf_${i}`,
@@ -702,6 +518,8 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
         time: `16:00`
       });
     }
+
+    // Finales
     list.push({
       id: "fin_1",
       phase: "final",
@@ -720,15 +538,19 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
       date: "2026-07-11",
       time: "16:00"
     });
+
     return list;
   }
 
-  const matchesMap = {};
+  // Inicializar mapa de partidos
+  const matchesMap: Record<string, any> = {};
   const defaults = createDefaultMatches();
+  
   defaults.forEach(m => {
     matchesMap[m.id] = m;
   });
 
+  // Sobrescribir con lo que ya exista en base de datos/S3
   if (Array.isArray(existingKnockoutMatches) && existingKnockoutMatches.length > 0) {
     existingKnockoutMatches.forEach(m => {
       if (m && m.id) {
@@ -737,34 +559,36 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
     });
   }
 
-  function getWinner(matchId) {
+  // Helper para resolver ganador/perdedor
+  function getWinner(matchId: string): string {
     const res = resultados[matchId];
     const m = matchesMap[matchId];
     if (!res || res.status !== "finished" || res.homeGoals == null || res.awayGoals == null || !m) {
       const matchNum = matchId.split('_')[1] || matchId;
-      return `Winner ${m?.phase === 'semis' ? 'SF' : m?.phase === 'cuartos' ? 'Cuartos' : m?.phase === 'octavos' ? 'Octavos' : '16vos'} ${matchNum}`;
+      return `Ganador ${m?.phase === 'semis' ? 'SF' : m?.phase === 'cuartos' ? 'Cuartos' : m?.phase === 'octavos' ? 'Octavos' : '16vos'} ${matchNum}`;
     }
     if (res.homeGoals > res.awayGoals) return m.local;
     if (res.awayGoals > res.homeGoals) return m.visitante;
     if (res.teamPasses === "home") return m.local;
     if (res.teamPasses === "away") return m.visitante;
-    return `Winner ${matchId}`;
+    return `Ganador ${matchId}`;
   }
 
-  function getLoser(matchId) {
+  function getLoser(matchId: string): string {
     const res = resultados[matchId];
     const m = matchesMap[matchId];
     if (!res || res.status !== "finished" || res.homeGoals == null || res.awayGoals == null || !m) {
       const matchNum = matchId.split('_')[1] || matchId;
-      return `Loser ${m?.phase === 'semis' ? 'SF' : m?.phase === 'cuartos' ? 'Cuartos' : m?.phase === 'octavos' ? 'Octavos' : '16vos'} ${matchNum}`;
+      return `Perdedor ${m?.phase === 'semis' ? 'SF' : m?.phase === 'cuartos' ? 'Cuartos' : m?.phase === 'octavos' ? 'Octavos' : '16vos'} ${matchNum}`;
     }
     if (res.homeGoals > res.awayGoals) return m.visitante;
     if (res.awayGoals > res.homeGoals) return m.local;
     if (res.teamPasses === "home") return m.visitante;
     if (res.teamPasses === "away") return m.local;
-    return `Loser ${matchId}`;
+    return `Perdedor ${matchId}`;
   }
 
+  // 4. Actualizar nombres de equipos en dieciseisavos (16vos)
   for (let i = 1; i <= 16; i++) {
     const matchId = `16v_${i}`;
     const m = matchesMap[matchId];
@@ -775,6 +599,7 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
     }
   }
 
+  // 5. Propagar Octavos (8v_1 a 8v_8)
   for (let i = 1; i <= 8; i++) {
     const m = matchesMap[`8v_${i}`];
     if (m) {
@@ -783,6 +608,7 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
     }
   }
 
+  // 6. Propagar Cuartos (4v_1 a 4v_4)
   for (let i = 1; i <= 4; i++) {
     const m = matchesMap[`4v_${i}`];
     if (m) {
@@ -791,6 +617,7 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
     }
   }
 
+  // 7. Propagar Semifinales (sf_1 y sf_2)
   for (let i = 1; i <= 2; i++) {
     const m = matchesMap[`sf_${i}`];
     if (m) {
@@ -799,6 +626,7 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
     }
   }
 
+  // 8. Propagar Gran Final y 3er Puesto
   const fin1 = matchesMap["fin_1"];
   if (fin1) {
     fin1.local = getWinner("sf_1");
@@ -810,7 +638,8 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
     fin2.visitante = getLoser("sf_2");
   }
 
-  return Object.values(matchesMap).sort((a, b) => {
+  // Retornar lista ordenada lógicamente
+  return Object.values(matchesMap).sort((a: any, b: any) => {
     const phases = ["16vos", "octavos", "cuartos", "semis", "final"];
     const rA = phases.indexOf(a.phase);
     const rB = phases.indexOf(b.phase);
@@ -818,4 +647,3 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
     return a.id.localeCompare(b.id, undefined, { numeric: true });
   });
 }
-
