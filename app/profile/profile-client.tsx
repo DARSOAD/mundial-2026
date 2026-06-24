@@ -44,8 +44,9 @@ export default function ProfileClient({
   // Filter only group stage matches
   const groupMatches = allMatches.filter(m => !["16VOS", "OCTAVOS", "CUARTOS", "SEMIS", "FINAL"].includes(m.group));
 
-  // Determine editable matches (group stage matches that have not passed yet)
-  const editableMatches = groupMatches.filter(m => !isMatchPassed(m));
+  // Determine editable matches (group stage matches that have not passed yet, AND the 'grupos' phase is active in settings)
+  const isGruposActive = activePhases.includes("grupos");
+  const editableMatches = isGruposActive ? groupMatches.filter(m => !isMatchPassed(m)) : [];
   const hasEditableMatches = editableMatches.length > 0;
 
   const handleInputChange = (matchId: string, field: "goles_local" | "goles_visitante", val: string) => {
@@ -217,7 +218,11 @@ export default function ProfileClient({
             </div>
           )}
 
-          {!hasEditedOnce && hasEditableMatches && !isEditing && (
+          {!isGruposActive ? (
+            <p className="text-[8px] text-red-500/80 uppercase font-black tracking-wider text-center">
+              * La fase de grupos está bloqueada. No se pueden modificar los pronósticos.
+            </p>
+          ) : !hasEditedOnce && hasEditableMatches && !isEditing && (
             <p className="text-[8px] text-yellow-500/80 uppercase font-black tracking-wider text-center animate-pulse">
               * Tienes 1 sola oportunidad para modificar tus pronósticos de partidos futuros.
             </p>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getLoggedInUser } from "@/lib/auth";
 import { getKnockoutMatches, getResults, getSystemSettings } from "@/lib/data";
 import { getFlag } from "@/lib/flags";
+import { computeKnockoutBracket } from "@/lib/bracket-utils";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const PHASES = ["16vos", "octavos", "cuartos", "semis", "final"];
@@ -16,6 +17,7 @@ export default function AdminKnockoutPage() {
   const [matches, setMatches] = useState<any[]>([]);
   const [results, setResults] = useState<Record<string, any>>({});
   const [activePhases, setActivePhases] = useState<string[]>([]);
+  const [calendario, setCalendario] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -30,18 +32,22 @@ export default function AdminKnockoutPage() {
         window.location.href = "/mundial-2026/";
         return;
       }
-      const [km, r, settings] = await Promise.all([
+      const [km, r, settings, cal] = await Promise.all([
         getKnockoutMatches(),
         getResults(),
-        getSystemSettings()
+        getSystemSettings(),
+        fetch("/mundial-2026/calendario.json?t=" + Date.now()).then(res => res.json()).catch(() => [])
       ]);
       setMatches(km);
       setResults(r);
       setActivePhases(settings.activePhases || ["grupos"]);
+      setCalendario(cal);
       setIsLoading(false);
     }
     load();
   }, []);
+
+  const displayedMatches = calendario.length > 0 ? computeKnockoutBracket(calendario, results, matches) : matches;
 
   function generateMatchId(phase: string, index: number) {
     const prefix = phase === "16vos" ? "16v" : phase === "octavos" ? "8v" : phase === "cuartos" ? "4v" : phase === "semis" ? "sf" : "fin";
@@ -139,9 +145,18 @@ export default function AdminKnockoutPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
-      <h2 className="text-3xl font-black text-white uppercase font-montserrat mb-8">
-        Gestionar <span className="text-yellow-500">Eliminatorias</span>
-      </h2>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <h2 className="text-3xl font-black text-white uppercase font-montserrat">
+          Gestionar <span className="text-yellow-500">Eliminatorias</span>
+        </h2>
+        <button
+          onClick={() => saveMatches(displayedMatches)}
+          disabled={saving || displayedMatches.length === 0}
+          className="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-black font-black px-6 py-3 rounded-xl text-xs uppercase tracking-wider transition-all self-start md:self-auto"
+        >
+          {saving ? "Guardando llaves..." : "💾 Guardar Estructura de Llaves"}
+        </button>
+      </div>
 
       {message && (
         <div className={`mb-6 p-4 rounded-2xl font-bold text-sm ${message.includes("Error") ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`}>
@@ -216,7 +231,7 @@ export default function AdminKnockoutPage() {
 
       {/* EXISTING KNOCKOUT MATCHES BY PHASE */}
       {PHASES.map(phase => {
-        const phaseMatches = matches.filter(m => m.phase === phase);
+        const phaseMatches = displayedMatches.filter(m => m.phase === phase);
         if (phaseMatches.length === 0) return null;
 
         return (

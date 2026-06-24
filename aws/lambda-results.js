@@ -148,6 +148,13 @@ export const handler = async (event) => {
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing predictions" }) };
       }
 
+      // Check if group stage predictions are active in settings
+      const settings = (await readJSON(BUCKET_NAME, `${PREFIX}/settings.json`)) || { activePhases: ["grupos"] };
+      const activePhases = settings.activePhases || ["grupos"];
+      if (!activePhases.includes("grupos")) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "La fase de grupos está bloqueada para predicciones." }) };
+      }
+
       const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`)) || [];
       const userIndex = existing.findIndex(u => u.participante.toLowerCase().replace(/\s+/g, '_') === userId);
       if (userIndex === -1) {
