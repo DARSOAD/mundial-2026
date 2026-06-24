@@ -114,16 +114,22 @@ export default function BracketClient({
             <img src={getFlag(m.local)} alt={m.local} className="w-5 h-5 object-cover rounded-full bg-black/20" />
             <span className="text-[10px] font-bold uppercase truncate text-white">{m.local}</span>
           </div>
-          <input
-            type="number" min="0"
-            value={pred.goles_local ?? ""}
-            disabled={!isPhaseActive || hasResult}
-            onChange={e => updatePred(m.id, 'goles_local', e.target.value === "" ? null : parseInt(e.target.value))}
-            className={`w-8 h-6 text-center font-black text-xs rounded outline-none border ${
-              !isPhaseActive || hasResult ? 'bg-transparent border-transparent text-white/50' :
-              'bg-[#1a1d24] border-white/10 focus:border-yellow-500 text-yellow-500'
-            }`}
-          />
+          {isPhaseActive ? (
+            <input
+              type="number" min="0"
+              value={pred.goles_local ?? ""}
+              disabled={hasResult}
+              onChange={e => updatePred(m.id, 'goles_local', e.target.value === "" ? null : parseInt(e.target.value))}
+              className={`w-8 h-6 text-center font-black text-xs rounded outline-none border ${
+                hasResult ? 'bg-transparent border-transparent text-white/50' :
+                'bg-[#1a1d24] border-white/10 focus:border-yellow-500 text-yellow-500'
+              }`}
+            />
+          ) : (
+            pred.goles_local != null && (
+              <span className="text-[10px] font-black text-white/60 mr-2">{pred.goles_local}</span>
+            )
+          )}
         </div>
 
         {/* VISITANTE */}
@@ -132,16 +138,22 @@ export default function BracketClient({
             <img src={getFlag(m.visitante)} alt={m.visitante} className="w-5 h-5 object-cover rounded-full bg-black/20" />
             <span className="text-[10px] font-bold uppercase truncate text-white">{m.visitante}</span>
           </div>
-          <input
-            type="number" min="0"
-            value={pred.goles_visitante ?? ""}
-            disabled={!isPhaseActive || hasResult}
-            onChange={e => updatePred(m.id, 'goles_visitante', e.target.value === "" ? null : parseInt(e.target.value))}
-            className={`w-8 h-6 text-center font-black text-xs rounded outline-none border ${
-              !isPhaseActive || hasResult ? 'bg-transparent border-transparent text-white/50' :
-              'bg-[#1a1d24] border-white/10 focus:border-yellow-500 text-yellow-500'
-            }`}
-          />
+          {isPhaseActive ? (
+            <input
+              type="number" min="0"
+              value={pred.goles_visitante ?? ""}
+              disabled={hasResult}
+              onChange={e => updatePred(m.id, 'goles_visitante', e.target.value === "" ? null : parseInt(e.target.value))}
+              className={`w-8 h-6 text-center font-black text-xs rounded outline-none border ${
+                hasResult ? 'bg-transparent border-transparent text-white/50' :
+                'bg-[#1a1d24] border-white/10 focus:border-yellow-500 text-yellow-500'
+              }`}
+            />
+          ) : (
+            pred.goles_visitante != null && (
+              <span className="text-[10px] font-black text-white/60 mr-2">{pred.goles_visitante}</span>
+            )
+          )}
         </div>
 
         {/* Penalty selector when prediction is tie */}

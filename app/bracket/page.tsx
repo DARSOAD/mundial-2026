@@ -1,10 +1,11 @@
 "use client";
-
+ 
 import { useEffect, useState } from "react";
 import { getLoggedInUser } from "@/lib/auth";
 import { getKnockoutMatches, getKnockoutPredictions, getResults, getSystemSettings } from "@/lib/data";
+import { computeKnockoutBracket } from "@/lib/bracket-utils";
 import BracketClient from "./bracket-client";
-
+ 
 export default function BracketPage() {
   const [user, setUser] = useState<any>(null);
   const [knockoutMatches, setKnockoutMatches] = useState<any[]>([]);
@@ -12,28 +13,40 @@ export default function BracketPage() {
   const [results, setResults] = useState<Record<string, any>>({});
   const [activePhases, setActivePhases] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+ 
   useEffect(() => {
     async function load() {
-      const [u, km, kp, r, settings] = await Promise.all([
-        getLoggedInUser(),
-        getKnockoutMatches(),
-        getKnockoutPredictions(),
-        getResults(),
-        getSystemSettings()
-      ]);
-
-      if (!u) {
-        window.location.href = '/mundial-2026/login/';
-        return;
+      try {
+        const [u, km, kp, r, settings, calendario] = await Promise.all([
+          getLoggedInUser(),
+          getKnockoutMatches(),
+          getKnockoutPredictions(),
+          getResults(),
+          getSystemSettings(),
+          fetch("/mundial-2026/calendario.json?t=" + Date.now()).then(res => res.json()).catch(() => [])
+        ]);
+ 
+        if (!u) {
+          window.location.href = '/mundial-2026/login/';
+          return;
+        }
+ 
+        setUser(u);
+        setAllPredictions(kp);
+        setResults(r);
+        setActivePhases(settings?.activePhases || ["grupos"]);
+ 
+        // Si no hay eliminatorias configuradas en S3, las calculamos al vuelo con las posiciones actuales
+        let matchesToUse = km;
+        if (!km || km.length === 0) {
+          matchesToUse = computeKnockoutBracket(calendario, r, []);
+        }
+        setKnockoutMatches(matchesToUse);
+      } catch (error) {
+        console.error("Error loading bracket page data:", error);
+      } finally {
+        setIsLoading(false);
       }
-
-      setUser(u);
-      setKnockoutMatches(km);
-      setAllPredictions(kp);
-      setResults(r);
-      setActivePhases(settings?.activePhases || ["grupos"]);
-      setIsLoading(false);
     }
     load();
   }, []);
