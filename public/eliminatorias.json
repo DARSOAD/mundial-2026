@@ -1,1 +1,290 @@
-[]
+[
+  {
+    "id": "16v_1",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Sudafrica",
+    "visitante": "Canada",
+    "date": "2026-06-28",
+    "time": "15:00"
+  },
+  {
+    "id": "16v_2",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Alemania",
+    "visitante": "Paraguay",
+    "date": "2026-06-28",
+    "time": "18:00"
+  },
+  {
+    "id": "16v_3",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Holanda",
+    "visitante": "Marruecos",
+    "date": "2026-06-28",
+    "time": "21:00"
+  },
+  {
+    "id": "16v_4",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Brasil",
+    "visitante": "Japon",
+    "date": "2026-06-28",
+    "time": "12:00"
+  },
+  {
+    "id": "16v_5",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Francia",
+    "visitante": "Suecia",
+    "date": "2026-06-29",
+    "time": "15:00"
+  },
+  {
+    "id": "16v_6",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Costa de Marfil",
+    "visitante": "Noruega",
+    "date": "2026-06-29",
+    "time": "18:00"
+  },
+  {
+    "id": "16v_7",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Mexico",
+    "visitante": "Escocia",
+    "date": "2026-06-29",
+    "time": "21:00"
+  },
+  {
+    "id": "16v_8",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Inglaterra",
+    "visitante": "Ecuador",
+    "date": "2026-06-29",
+    "time": "12:00"
+  },
+  {
+    "id": "16v_9",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "USA",
+    "visitante": "Bosnia y Herzegovina",
+    "date": "2026-06-30",
+    "time": "15:00"
+  },
+  {
+    "id": "16v_10",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Espana",
+    "visitante": "Corea del Sur",
+    "date": "2026-06-30",
+    "time": "18:00"
+  },
+  {
+    "id": "16v_11",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Portugal",
+    "visitante": "Ghana",
+    "date": "2026-06-30",
+    "time": "21:00"
+  },
+  {
+    "id": "16v_12",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Egipto",
+    "visitante": "Austria",
+    "date": "2026-06-30",
+    "time": "12:00"
+  },
+  {
+    "id": "16v_13",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Suiza",
+    "visitante": "Argelia",
+    "date": "2026-06-31",
+    "time": "15:00"
+  },
+  {
+    "id": "16v_14",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Argentina",
+    "visitante": "Iran",
+    "date": "2026-06-31",
+    "time": "18:00"
+  },
+  {
+    "id": "16v_15",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Colombia",
+    "visitante": "Croacia",
+    "date": "2026-06-31",
+    "time": "21:00"
+  },
+  {
+    "id": "16v_16",
+    "phase": "16vos",
+    "group": "16VOS",
+    "local": "Australia",
+    "visitante": "Uruguay",
+    "date": "2026-06-31",
+    "time": "12:00"
+  },
+  {
+    "id": "8v_1",
+    "phase": "octavos",
+    "group": "OCTAVOS",
+    "local": "Ganador 16vos 1",
+    "visitante": "Ganador 16vos 2",
+    "date": "2026-07-2",
+    "time": "16:00"
+  },
+  {
+    "id": "8v_2",
+    "phase": "octavos",
+    "group": "OCTAVOS",
+    "local": "Ganador 16vos 3",
+    "visitante": "Ganador 16vos 4",
+    "date": "2026-07-2",
+    "time": "12:00"
+  },
+  {
+    "id": "8v_3",
+    "phase": "octavos",
+    "group": "OCTAVOS",
+    "local": "Ganador 16vos 5",
+    "visitante": "Ganador 16vos 6",
+    "date": "2026-07-3",
+    "time": "16:00"
+  },
+  {
+    "id": "8v_4",
+    "phase": "octavos",
+    "group": "OCTAVOS",
+    "local": "Ganador 16vos 7",
+    "visitante": "Ganador 16vos 8",
+    "date": "2026-07-3",
+    "time": "12:00"
+  },
+  {
+    "id": "8v_5",
+    "phase": "octavos",
+    "group": "OCTAVOS",
+    "local": "Ganador 16vos 9",
+    "visitante": "Ganador 16vos 10",
+    "date": "2026-07-4",
+    "time": "16:00"
+  },
+  {
+    "id": "8v_6",
+    "phase": "octavos",
+    "group": "OCTAVOS",
+    "local": "Ganador 16vos 11",
+    "visitante": "Ganador 16vos 12",
+    "date": "2026-07-4",
+    "time": "12:00"
+  },
+  {
+    "id": "8v_7",
+    "phase": "octavos",
+    "group": "OCTAVOS",
+    "local": "Ganador 16vos 13",
+    "visitante": "Ganador 16vos 14",
+    "date": "2026-07-5",
+    "time": "16:00"
+  },
+  {
+    "id": "8v_8",
+    "phase": "octavos",
+    "group": "OCTAVOS",
+    "local": "Ganador 16vos 15",
+    "visitante": "Ganador 16vos 16",
+    "date": "2026-07-5",
+    "time": "12:00"
+  },
+  {
+    "id": "4v_1",
+    "phase": "cuartos",
+    "group": "CUARTOS",
+    "local": "Ganador Octavos 1",
+    "visitante": "Ganador Octavos 2",
+    "date": "2026-07-5",
+    "time": "18:00"
+  },
+  {
+    "id": "4v_2",
+    "phase": "cuartos",
+    "group": "CUARTOS",
+    "local": "Ganador Octavos 3",
+    "visitante": "Ganador Octavos 4",
+    "date": "2026-07-5",
+    "time": "14:00"
+  },
+  {
+    "id": "4v_3",
+    "phase": "cuartos",
+    "group": "CUARTOS",
+    "local": "Ganador Octavos 5",
+    "visitante": "Ganador Octavos 6",
+    "date": "2026-07-6",
+    "time": "18:00"
+  },
+  {
+    "id": "4v_4",
+    "phase": "cuartos",
+    "group": "CUARTOS",
+    "local": "Ganador Octavos 7",
+    "visitante": "Ganador Octavos 8",
+    "date": "2026-07-6",
+    "time": "14:00"
+  },
+  {
+    "id": "sf_1",
+    "phase": "semis",
+    "group": "SEMIS",
+    "local": "Ganador Cuartos 1",
+    "visitante": "Ganador Cuartos 2",
+    "date": "2026-07-08",
+    "time": "16:00"
+  },
+  {
+    "id": "sf_2",
+    "phase": "semis",
+    "group": "SEMIS",
+    "local": "Ganador Cuartos 3",
+    "visitante": "Ganador Cuartos 4",
+    "date": "2026-07-08",
+    "time": "16:00"
+  },
+  {
+    "id": "fin_1",
+    "phase": "final",
+    "group": "FINAL",
+    "local": "Ganador SF 1",
+    "visitante": "Ganador SF 2",
+    "date": "2026-07-12",
+    "time": "16:00"
+  },
+  {
+    "id": "fin_2",
+    "phase": "final",
+    "group": "FINAL",
+    "local": "Perdedor SF 1",
+    "visitante": "Perdedor SF 2",
+    "date": "2026-07-11",
+    "time": "16:00"
+  }
+]

@@ -289,14 +289,14 @@ export function getStandingsAndQualified(calendario: any[], resultados: Record<s
  */
 export function assignThirdsToSlots(bestThirds: TeamStats[]): ThirdsSlotAssignment[] | null {
   const slots = [
-    { id: "16v_2", name: "1E", allowed: ["A", "B", "C", "D", "F"] },
-    { id: "16v_5", name: "1I", allowed: ["C", "D", "F", "G", "H"] },
+    { id: "16v_2", name: "1E", allowed: ["D", "C", "B", "A", "F"] },
+    { id: "16v_5", name: "1I", allowed: ["F", "G", "H", "D", "C"] },
     { id: "16v_7", name: "1A", allowed: ["C", "E", "F", "H", "I"] },
     { id: "16v_8", name: "1L", allowed: ["E", "H", "I", "J", "K"] },
     { id: "16v_9", name: "1D", allowed: ["B", "E", "F", "I", "J"] },
     { id: "16v_10", name: "1G", allowed: ["A", "E", "H", "I", "J"] },
-    { id: "16v_13", name: "1B", allowed: ["E", "F", "G", "I", "J"] },
-    { id: "16v_15", name: "1K", allowed: ["D", "E", "I", "J", "L"] }
+    { id: "16v_13", name: "1B", allowed: ["J", "E", "F", "G", "I"] },
+    { id: "16v_15", name: "1K", allowed: ["L", "D", "E", "I", "J"] }
   ];
 
   const assignment = new Array(slots.length).fill(null);
@@ -306,12 +306,11 @@ export function assignThirdsToSlots(bestThirds: TeamStats[]): ThirdsSlotAssignme
     if (slotIdx === slots.length) return true;
 
     const slot = slots[slotIdx];
-    for (let i = 0; i < bestThirds.length; i++) {
-      if (!used[i]) {
-        const team = bestThirds[i];
-        if (slot.allowed.includes(team.group)) {
+    for (const groupOpt of slot.allowed) {
+      for (let i = 0; i < bestThirds.length; i++) {
+        if (!used[i] && bestThirds[i].group === groupOpt) {
           used[i] = true;
-          assignment[slotIdx] = team;
+          assignment[slotIdx] = bestThirds[i];
           if (backtrack(slotIdx + 1)) return true;
           // Backtrack
           used[i] = false;
@@ -341,14 +340,14 @@ export function assignThirdsWithFallback(bestThirds: TeamStats[]): ThirdsSlotAss
   if (result) return result;
 
   const slots = [
-    { id: "16v_2", name: "1E", allowed: ["A", "B", "C", "D", "F"] },
-    { id: "16v_5", name: "1I", allowed: ["C", "D", "F", "G", "H"] },
+    { id: "16v_2", name: "1E", allowed: ["D", "C", "B", "A", "F"] },
+    { id: "16v_5", name: "1I", allowed: ["F", "G", "H", "D", "C"] },
     { id: "16v_7", name: "1A", allowed: ["C", "E", "F", "H", "I"] },
     { id: "16v_8", name: "1L", allowed: ["E", "H", "I", "J", "K"] },
     { id: "16v_9", name: "1D", allowed: ["B", "E", "F", "I", "J"] },
     { id: "16v_10", name: "1G", allowed: ["A", "E", "H", "I", "J"] },
-    { id: "16v_13", name: "1B", allowed: ["E", "F", "G", "I", "J"] },
-    { id: "16v_15", name: "1K", allowed: ["D", "E", "I", "J", "L"] }
+    { id: "16v_13", name: "1B", allowed: ["J", "E", "F", "G", "I"] },
+    { id: "16v_15", name: "1K", allowed: ["L", "D", "E", "I", "J"] }
   ];
 
   const matched: ThirdsSlotAssignment[] = [];
