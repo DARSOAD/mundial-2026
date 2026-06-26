@@ -504,12 +504,12 @@ function getStandingsAndQualified(calendario, resultados) {
 function assignThirdsToSlots(bestThirds) {
   const slots = [
     { id: "16v_2", name: "1E", allowed: ["D", "C", "B", "A", "F"] },
-    { id: "16v_5", name: "1I", allowed: ["F", "G", "H", "D", "C"] },
-    { id: "16v_7", name: "1A", allowed: ["C", "E", "F", "H", "I"] },
-    { id: "16v_8", name: "1L", allowed: ["E", "H", "I", "J", "K"] },
+    { id: "16v_5", name: "1I", allowed: ["F", "H", "G", "D", "C"] },
+    { id: "16v_7", name: "1A", allowed: ["C", "E", "F", "G", "I"] },
+    { id: "16v_8", name: "1L", allowed: ["E", "G", "I", "J", "K"] },
     { id: "16v_9", name: "1D", allowed: ["B", "E", "F", "I", "J"] },
-    { id: "16v_10", name: "1G", allowed: ["A", "E", "H", "I", "J"] },
-    { id: "16v_13", name: "1B", allowed: ["J", "E", "F", "G", "I"] },
+    { id: "16v_10", name: "1H", allowed: ["A", "E", "G", "I", "J"] },
+    { id: "16v_13", name: "1B", allowed: ["J", "E", "F", "H", "I"] },
     { id: "16v_15", name: "1K", allowed: ["L", "D", "E", "I", "J"] }
   ];
 
@@ -551,12 +551,12 @@ function assignThirdsWithFallback(bestThirds) {
 
   const slots = [
     { id: "16v_2", name: "1E", allowed: ["D", "C", "B", "A", "F"] },
-    { id: "16v_5", name: "1I", allowed: ["F", "G", "H", "D", "C"] },
-    { id: "16v_7", name: "1A", allowed: ["C", "E", "F", "H", "I"] },
-    { id: "16v_8", name: "1L", allowed: ["E", "H", "I", "J", "K"] },
+    { id: "16v_5", name: "1I", allowed: ["F", "H", "G", "D", "C"] },
+    { id: "16v_7", name: "1A", allowed: ["C", "E", "F", "G", "I"] },
+    { id: "16v_8", name: "1L", allowed: ["E", "G", "I", "J", "K"] },
     { id: "16v_9", name: "1D", allowed: ["B", "E", "F", "I", "J"] },
-    { id: "16v_10", name: "1G", allowed: ["A", "E", "H", "I", "J"] },
-    { id: "16v_13", name: "1B", allowed: ["J", "E", "F", "G", "I"] },
+    { id: "16v_10", name: "1H", allowed: ["A", "E", "G", "I", "J"] },
+    { id: "16v_13", name: "1B", allowed: ["J", "E", "F", "H", "I"] },
     { id: "16v_15", name: "1K", allowed: ["L", "D", "E", "I", "J"] }
   ];
 
@@ -633,24 +633,24 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
       visitante: () => thirdsBySlotId["16v_9"]?.name || "3° B/E/F/I/J"
     },
     "16v_10": {
-      local: () => qualified1st["G"]?.name || "1° Grupo G",
-      visitante: () => thirdsBySlotId["16v_10"]?.name || "3° A/E/H/I/J"
+      local: () => qualified1st["H"]?.name || "1° Grupo H",
+      visitante: () => thirdsBySlotId["16v_10"]?.name || "3° A/E/G/I/J"
     },
     "16v_11": {
       local: () => qualified2nd["K"]?.name || "2° Grupo K",
       visitante: () => qualified2nd["L"]?.name || "2° Grupo L"
     },
     "16v_12": {
-      local: () => qualified1st["H"]?.name || "1° Grupo H",
+      local: () => qualified1st["G"]?.name || "1° Grupo G",
       visitante: () => qualified2nd["J"]?.name || "2° Grupo J"
     },
     "16v_13": {
       local: () => qualified1st["B"]?.name || "1° Grupo B",
-      visitante: () => thirdsBySlotId["16v_13"]?.name || "3° E/F/G/I/J"
+      visitante: () => thirdsBySlotId["16v_13"]?.name || "3° E/F/H/I/J"
     },
     "16v_14": {
       local: () => qualified1st["J"]?.name || "1° Grupo J",
-      visitante: () => qualified2nd["H"]?.name || "2° Grupo H"
+      visitante: () => qualified2nd["G"]?.name || "2° Grupo G"
     },
     "16v_15": {
       local: () => qualified1st["K"]?.name || "1° Grupo K",
@@ -658,7 +658,7 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
     },
     "16v_16": {
       local: () => qualified2nd["D"]?.name || "2° Grupo D",
-      visitante: () => qualified2nd["G"]?.name || "2° Grupo G"
+      visitante: () => qualified2nd["H"]?.name || "2° Grupo H"
     }
   };
 
