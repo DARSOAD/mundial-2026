@@ -128,13 +128,61 @@ export const handler = async (event) => {
       const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`)) || {};
       if (!existing[userId]) existing[userId] = {};
 
+      const knockoutMatches = (await readJSON(BUCKET_NAME, `${PREFIX}/eliminatorias.json`)) || [];
+      const results = (await readJSON(BUCKET_NAME, `${PREFIX}/resultados.json`)) || {};
+      const now = Date.now();
+      const lockThreshold = 10 * 60 * 1000; // 10 minutes in ms
+
+      function isMatchLocked(match) {
+        if (!match) return false;
+        const res = results[match.id];
+        if (res && res.homeGoals != null && res.awayGoals != null) return true;
+
+        if (match.date) {
+          try {
+            const timeStr = match.time ? (match.time.includes(":") ? match.time : `${match.time}:00`) : "00:00";
+            const matchDateTimeStr = `${match.date}T${timeStr}:00-05:00`;
+            const matchTime = new Date(matchDateTimeStr).getTime();
+            if (now >= (matchTime - lockThreshold)) {
+              return true;
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+        return false;
+      }
+
       if (predictions && typeof predictions === "object") {
+        const lockedMatchIds = [];
+        Object.keys(predictions).forEach(mId => {
+          const match = knockoutMatches.find(m => m.id === mId);
+          if (isMatchLocked(match)) {
+            lockedMatchIds.push(mId);
+          }
+        });
+        if (lockedMatchIds.length > 0) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: `No se pudieron guardar. Los siguientes partidos están bloqueados: ${lockedMatchIds.join(", ")}` })
+          };
+        }
+
         Object.entries(predictions).forEach(([mId, pred]) => {
           existing[userId][mId] = pred;
         });
       } else {
         if (!matchId || !prediction) {
           return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing matchId, prediction or predictions" }) };
+        }
+        const match = knockoutMatches.find(m => m.id === matchId);
+        if (isMatchLocked(match)) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: "El partido está bloqueado para predicciones (comienza en menos de 10 minutos o ya finalizó)" })
+          };
         }
         existing[userId][matchId] = prediction;
       }
@@ -194,7 +242,8 @@ export const handler = async (event) => {
           try {
             const matchDateTimeStr = `${match.date}T${match.time_colombia}:00-05:00`;
             const matchTime = new Date(matchDateTimeStr).getTime();
-            if (now >= matchTime) {
+            const lockThreshold = 10 * 60 * 1000; // 10 minutes in ms
+            if (now >= (matchTime - lockThreshold)) {
               hasPassed = true;
             }
           } catch (e) {

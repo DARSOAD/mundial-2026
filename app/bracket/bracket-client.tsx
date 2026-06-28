@@ -31,6 +31,23 @@ export default function BracketClient({
     }));
   }
 
+  function isMatchLocked(m: any, result: any) {
+    if (!m) return true;
+    if (result && result.homeGoals != null && result.awayGoals != null) {
+      return true;
+    }
+    if (!m.date) return false;
+    try {
+      const timeStr = m.time ? (m.time.includes(":") ? m.time : `${m.time}:00`) : "00:00";
+      const matchDateTimeStr = `${m.date}T${timeStr}:00-05:00`;
+      const matchTime = new Date(matchDateTimeStr).getTime();
+      const lockThreshold = 10 * 60 * 1000; // 10 minutes in ms
+      return Date.now() >= (matchTime - lockThreshold);
+    } catch (e) {
+      return false;
+    }
+  }
+
   async function savePrediction(matchId: string) {
     setIsSaving(true);
     setSavedMsg("");
@@ -86,6 +103,9 @@ export default function BracketClient({
     const predictionsToSave: Record<string, any> = {};
     
     activeMatches.forEach(m => {
+      const isLocked = isMatchLocked(m, results[m.id]);
+      if (isLocked) return; // Skip locked matches from validation and saving
+
       const pred = preds[m.id];
       const localName = m.local || "Local";
       const visitanteName = m.visitante || "Visitante";
@@ -181,6 +201,7 @@ export default function BracketClient({
     const pred = preds[m.id] || {};
     const result = results[m.id];
     const hasResult = result && result.homeGoals != null && result.awayGoals != null;
+    const isLocked = isMatchLocked(m, result);
     const isTiePred = pred.goles_local != null && pred.goles_visitante != null && pred.goles_local === pred.goles_visitante;
 
     return (
@@ -192,6 +213,12 @@ export default function BracketClient({
         <p className="text-[7px] font-black uppercase text-yellow-500 tracking-wider text-center mb-2">
           {m.date} {m.time && `• ${m.time}`}
         </p>
+        
+        {isLocked && !hasResult && (
+          <p className="text-[7px] font-black uppercase text-red-500 tracking-wider text-center mb-2">
+            🔒 Cerrado (comienza en &lt; 10 min)
+          </p>
+        )}
 
         {/* Result bar if finished */}
         {hasResult && (
@@ -215,10 +242,10 @@ export default function BracketClient({
             <input
               type="number" min="0"
               value={pred.goles_local ?? ""}
-              disabled={hasResult}
+              disabled={hasResult || isLocked}
               onChange={e => updatePred(m.id, 'goles_local', e.target.value === "" ? null : parseInt(e.target.value))}
               className={`w-8 h-6 text-center font-black text-xs rounded outline-none border ${
-                hasResult ? 'bg-transparent border-transparent text-white/50' :
+                (hasResult || isLocked) ? 'bg-transparent border-transparent text-white/50' :
                 'bg-[#1a1d24] border-white/10 focus:border-yellow-500 text-yellow-500'
               }`}
             />
@@ -239,10 +266,10 @@ export default function BracketClient({
             <input
               type="number" min="0"
               value={pred.goles_visitante ?? ""}
-              disabled={hasResult}
+              disabled={hasResult || isLocked}
               onChange={e => updatePred(m.id, 'goles_visitante', e.target.value === "" ? null : parseInt(e.target.value))}
               className={`w-8 h-6 text-center font-black text-xs rounded outline-none border ${
-                hasResult ? 'bg-transparent border-transparent text-white/50' :
+                (hasResult || isLocked) ? 'bg-transparent border-transparent text-white/50' :
                 'bg-[#1a1d24] border-white/10 focus:border-yellow-500 text-yellow-500'
               }`}
             />
@@ -254,7 +281,7 @@ export default function BracketClient({
         </div>
 
         {/* Penalty selector when prediction is tie */}
-        {isTiePred && isPhaseActive && !hasResult && (
+        {isTiePred && isPhaseActive && !hasResult && !isLocked && (
           <div className="mt-2 flex gap-1">
             <button
               onClick={() => updatePred(m.id, 'team_passes', 'home')}
@@ -276,7 +303,7 @@ export default function BracketClient({
         )}
 
         {/* Save button per match */}
-        {isPhaseActive && !hasResult && (
+        {isPhaseActive && !hasResult && !isLocked && (
           <button
             onClick={() => savePrediction(m.id)}
             disabled={isSaving}

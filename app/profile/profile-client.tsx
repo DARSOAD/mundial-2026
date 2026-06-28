@@ -25,7 +25,7 @@ export default function ProfileClient({
 
   const finals = user.finals || { campeon: "", subcampeon: "", tercer_lugar: "", cuarto_lugar: "" };
 
-  // Helper to check if a match has passed (either has results or kickoff date/time is past)
+  // Helper to check if a match has passed (either has results or kickoff date/time is past / starts in less than 10 mins)
   function isMatchPassed(match: any) {
     if (results[match.id] && results[match.id].homeGoals != null && results[match.id].awayGoals != null) {
       return true;
@@ -35,7 +35,8 @@ export default function ProfileClient({
       // Date format is YYYY-MM-DD, time format is HH:MM in Colombian time (UTC-5)
       const matchDateTimeStr = `${match.date}T${match.time}:00-05:00`;
       const matchTime = new Date(matchDateTimeStr).getTime();
-      return Date.now() >= matchTime;
+      const lockThreshold = 10 * 60 * 1000; // 10 minutes in ms
+      return Date.now() >= (matchTime - lockThreshold);
     } catch (e) {
       return false;
     }
