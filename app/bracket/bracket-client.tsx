@@ -67,6 +67,103 @@ export default function BracketClient({
     setTimeout(() => setSavedMsg(""), 2000);
   }
 
+  async function saveAllPredictions() {
+    setIsSaving(true);
+    setSavedMsg("");
+    
+    // Find all matches in active phases
+    const activeMatches = knockoutMatches.filter(m => activePhases.includes(m.phase));
+    
+    if (activeMatches.length === 0) {
+      setSavedMsg("No hay fases activas para pronosticar");
+      setIsSaving(false);
+      return;
+    }
+    
+    // Validate that all active matches have predictions
+    const missingMatches: string[] = [];
+    const missingTies: string[] = [];
+    const predictionsToSave: Record<string, any> = {};
+    
+    activeMatches.forEach(m => {
+      const pred = preds[m.id];
+      const localName = m.local || "Local";
+      const visitanteName = m.visitante || "Visitante";
+      const matchLabel = `${m.phase.toUpperCase()} - ${m.id} (${localName} vs ${visitanteName})`;
+      
+      if (!pred || pred.goles_local == null || pred.goles_visitante == null) {
+        missingMatches.push(matchLabel);
+      } else {
+        if (pred.goles_local === pred.goles_visitante && !pred.team_passes) {
+          missingTies.push(matchLabel);
+        }
+        predictionsToSave[m.id] = pred;
+      }
+    });
+    
+    if (missingMatches.length > 0 || missingTies.length > 0) {
+      let warning = "Por favor completa el bracket:\n\n";
+      if (missingMatches.length > 0) {
+        warning += "Faltan goles en:\n" + missingMatches.map(m => `• ${m}`).join("\n") + "\n\n";
+      }
+      if (missingTies.length > 0) {
+        warning += "Falta elegir quién pasa (penales) en:\n" + missingTies.map(m => `• ${m}`).join("\n") + "\n";
+      }
+      alert(warning);
+      setSavedMsg("Faltan completar predicciones");
+      setIsSaving(false);
+      return;
+    }
+    
+    try {
+      // Try bulk save first
+      const res = await fetch(`${API_URL}/manage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "saveKnockoutPrediction",
+          userId: user.userId,
+          predictions: predictionsToSave
+        })
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        setSavedMsg("🏆 ¡Todo el bracket guardado!");
+      } else {
+        // Sequential fallback
+        console.warn("Bulk save failed, attempting sequential save...");
+        let success = true;
+        for (const [mId, pred] of Object.entries(predictionsToSave)) {
+          const sRes = await fetch(`${API_URL}/manage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "saveKnockoutPrediction",
+              userId: user.userId,
+              matchId: mId,
+              prediction: pred
+            })
+          });
+          const sData = await sRes.json();
+          if (!sData.success) {
+            success = false;
+            break;
+          }
+        }
+        if (success) {
+          setSavedMsg("🏆 ¡Todo el bracket guardado!");
+        } else {
+          setSavedMsg("Error al guardar");
+        }
+      }
+    } catch (e: any) {
+      setSavedMsg("Error: " + e.message);
+    }
+    setIsSaving(false);
+    setTimeout(() => setSavedMsg(""), 4000);
+  }
+
   if (knockoutMatches.length === 0) {
     return (
       <div className="text-center py-20">
@@ -209,10 +306,24 @@ export default function BracketClient({
   return (
     <div className="flex flex-col relative min-h-screen">
       {savedMsg && (
-        <div className="fixed top-20 right-4 z-50 bg-yellow-500 text-black font-black px-4 py-2 rounded-xl text-xs uppercase animate-pulse">
+        <div className="fixed top-20 right-4 z-50 bg-yellow-500 text-black font-black px-4 py-2 rounded-xl text-xs uppercase animate-pulse shadow-lg">
           {savedMsg}
         </div>
       )}
+
+      {/* Botón para Guardar Todo el Bracket */}
+      <div className="flex flex-col items-center mb-8 gap-2">
+        <button
+          onClick={saveAllPredictions}
+          disabled={isSaving}
+          className="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-black font-black px-8 py-4 rounded-2xl text-sm uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-yellow-500/20 active:scale-95 cursor-pointer"
+        >
+          {isSaving ? "💾 Guardando Bracket..." : "💾 Guardar Todo el Bracket"}
+        </button>
+        <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">
+          Nota: Se validará que hayas completado todos los marcadores y desempates de las fases activas.
+        </p>
+      </div>
 
       <div className="overflow-x-auto pb-20 px-4">
         <div className="min-w-[1200px] flex justify-between items-center gap-4 relative">

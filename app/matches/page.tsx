@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getResults } from "@/lib/data";
+import { getResults, getKnockoutMatches } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
 import { getFlag } from "@/lib/flags";
 import Link from "next/link";
@@ -13,9 +13,13 @@ export default function MatchesPage() {
 
   useEffect(() => {
     async function load() {
-      const [results, m] = await Promise.all([getResults(), getAllMatches()]);
+      const [results, m, km] = await Promise.all([
+        getResults(),
+        getAllMatches(),
+        getKnockoutMatches()
+      ]);
       setData({ realResults: results });
-      setMatches(m);
+      setMatches([...m, ...km]);
       setIsLoading(false);
     }
     load();

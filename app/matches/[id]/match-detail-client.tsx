@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getResults, getParticipants } from "@/lib/data";
+import { getResults, getParticipants, getKnockoutMatches } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
 import { getFlag } from "@/lib/flags";
 import { notFound } from "next/navigation";
@@ -14,13 +14,14 @@ export default function MatchDetailClient({ matchId }: { matchId: string }) {
   useEffect(() => {
     async function load() {
       try {
-        const [results, participants, m] = await Promise.all([
+        const [results, participants, m, km] = await Promise.all([
           getResults(),
           getParticipants(),
-          getAllMatches()
+          getAllMatches(),
+          getKnockoutMatches()
         ]);
         setData({ participants, realResults: results });
-        setMatches(m);
+        setMatches([...m, ...km]);
       } catch (error) {
         console.error("Error loading match detail data:", error);
       } finally {

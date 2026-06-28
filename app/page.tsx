@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getAllMatches } from "@/lib/matches";
 import { getFlag } from "@/lib/flags";
 import { getDetailedPoints, MatchResult } from "@/lib/scoring";
-import { getResults, getParticipants } from "@/lib/data";
+import { getResults, getParticipants, getKnockoutMatches } from "@/lib/data";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -15,13 +15,14 @@ export default function HomePage() {
   useEffect(() => {
     async function load() {
       try {
-        const [results, participants, m] = await Promise.all([
+        const [results, participants, m, km] = await Promise.all([
           getResults(),
           getParticipants(),
-          getAllMatches()
+          getAllMatches(),
+          getKnockoutMatches()
         ]);
         setData({ participants, realResults: results });
-        setMatches(m);
+        setMatches([...m, ...km]);
       } catch (error) {
         console.error("Error loading home page data:", error);
       } finally {

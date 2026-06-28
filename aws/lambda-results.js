@@ -123,14 +123,21 @@ export const handler = async (event) => {
       if (!userId) {
         return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
       }
-      const { matchId, prediction } = body;
-      if (!matchId || !prediction) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing matchId or prediction" }) };
-      }
-
+      const { matchId, prediction, predictions } = body;
+      
       const existing = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`)) || {};
       if (!existing[userId]) existing[userId] = {};
-      existing[userId][matchId] = prediction;
+
+      if (predictions && typeof predictions === "object") {
+        Object.entries(predictions).forEach(([mId, pred]) => {
+          existing[userId][mId] = pred;
+        });
+      } else {
+        if (!matchId || !prediction) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing matchId, prediction or predictions" }) };
+        }
+        existing[userId][matchId] = prediction;
+      }
 
       await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`, existing);
       await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones-eliminatorias.json`]);
