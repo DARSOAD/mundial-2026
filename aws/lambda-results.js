@@ -559,14 +559,14 @@ function getStandingsAndQualified(calendario, resultados) {
 
 function assignThirdsToSlots(bestThirds) {
   const slots = [
-    { id: "16v_2", name: "1E", allowed: ["D", "C", "B", "A", "F"] },
-    { id: "16v_5", name: "1I", allowed: ["F", "G", "H", "D", "C"] },
+    { id: "16v_3", name: "1E", allowed: ["D", "C", "B", "A", "F"] },
+    { id: "16v_6", name: "1I", allowed: ["F", "G", "H", "D", "C"] },
     { id: "16v_7", name: "1A", allowed: ["C", "E", "F", "H", "I"] },
     { id: "16v_8", name: "1L", allowed: ["E", "H", "I", "J", "K"] },
-    { id: "16v_9", name: "1D", allowed: ["B", "E", "F", "I", "J"] },
-    { id: "16v_10", name: "1G", allowed: ["A", "E", "H", "I", "J"] },
+    { id: "16v_10", name: "1D", allowed: ["B", "E", "F", "I", "J"] },
+    { id: "16v_9", name: "1G", allowed: ["A", "E", "H", "I", "J"] },
     { id: "16v_13", name: "1B", allowed: ["J", "E", "F", "G", "I"] },
-    { id: "16v_15", name: "1K", allowed: ["L", "D", "E", "I", "J"] }
+    { id: "16v_16", name: "1K", allowed: ["L", "D", "E", "I", "J"] }
   ];
 
   const assignment = new Array(slots.length).fill(null);
@@ -606,14 +606,14 @@ function assignThirdsWithFallback(bestThirds) {
   if (result) return result;
 
   const slots = [
-    { id: "16v_2", name: "1E", allowed: ["D", "C", "B", "A", "F"] },
-    { id: "16v_5", name: "1I", allowed: ["F", "G", "H", "D", "C"] },
+    { id: "16v_3", name: "1E", allowed: ["D", "C", "B", "A", "F"] },
+    { id: "16v_6", name: "1I", allowed: ["F", "G", "H", "D", "C"] },
     { id: "16v_7", name: "1A", allowed: ["C", "E", "F", "H", "I"] },
     { id: "16v_8", name: "1L", allowed: ["E", "H", "I", "J", "K"] },
-    { id: "16v_9", name: "1D", allowed: ["B", "E", "F", "I", "J"] },
-    { id: "16v_10", name: "1G", allowed: ["A", "E", "H", "I", "J"] },
+    { id: "16v_10", name: "1D", allowed: ["B", "E", "F", "I", "J"] },
+    { id: "16v_9", name: "1G", allowed: ["A", "E", "H", "I", "J"] },
     { id: "16v_13", name: "1B", allowed: ["J", "E", "F", "G", "I"] },
-    { id: "16v_15", name: "1K", allowed: ["L", "D", "E", "I", "J"] }
+    { id: "16v_16", name: "1K", allowed: ["L", "D", "E", "I", "J"] }
   ];
 
   const matched = [];
@@ -653,125 +653,197 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
 
   const r32Sources = {
     "16v_1": {
+      // Bracket A: Sudáfrica vs Canadá (2A vs 2B)
       local: () => qualified2nd["A"]?.name || "2° Grupo A",
       visitante: () => qualified2nd["B"]?.name || "2° Grupo B"
     },
     "16v_2": {
-      local: () => qualified1st["E"]?.name || "1° Grupo E",
-      visitante: () => thirdsBySlotId["16v_2"]?.name || "3° A/B/C/D/F"
-    },
-    "16v_3": {
-      local: () => qualified1st["F"]?.name || "1° Grupo F",
-      visitante: () => qualified2nd["C"]?.name || "2° Grupo C"
-    },
-    "16v_4": {
+      // Bracket B: Brasil vs Japón (1C vs 2F)
       local: () => qualified1st["C"]?.name || "1° Grupo C",
       visitante: () => qualified2nd["F"]?.name || "2° Grupo F"
     },
-    "16v_5": {
-      local: () => qualified1st["I"]?.name || "1° Grupo I",
-      visitante: () => thirdsBySlotId["16v_5"]?.name || "3° C/D/F/G/H"
+    "16v_3": {
+      // Bracket C: Alemania vs Paraguay (1E vs 1E_third)
+      local: () => qualified1st["E"]?.name || "1° Grupo E",
+      visitante: () => thirdsBySlotId["16v_3"]?.name || "3° A/B/C/D/F"
     },
-    "16v_6": {
+    "16v_4": {
+      // Bracket D: Países Bajos vs Marruecos (1F vs 2C)
+      local: () => qualified1st["F"]?.name || "1° Grupo F",
+      visitante: () => qualified2nd["C"]?.name || "2° Grupo C"
+    },
+    "16v_5": {
+      // Bracket E: Costa de Marfil vs Noruega (2E vs 2I)
       local: () => qualified2nd["E"]?.name || "2° Grupo E",
       visitante: () => qualified2nd["I"]?.name || "2° Grupo I"
     },
+    "16v_6": {
+      // Bracket F: Francia vs Suecia (1I vs 1I_third)
+      local: () => qualified1st["I"]?.name || "1° Grupo I",
+      visitante: () => thirdsBySlotId["16v_6"]?.name || "3° C/D/F/G/H"
+    },
     "16v_7": {
+      // Bracket G: México vs Ecuador (1A vs 1A_third)
       local: () => qualified1st["A"]?.name || "1° Grupo A",
       visitante: () => thirdsBySlotId["16v_7"]?.name || "3° C/E/F/H/I"
     },
     "16v_8": {
+      // Bracket H: Inglaterra vs RD Congo (1L vs 1L_third)
       local: () => qualified1st["L"]?.name || "1° Grupo L",
       visitante: () => thirdsBySlotId["16v_8"]?.name || "3° E/H/I/J/K"
     },
     "16v_9": {
-      local: () => qualified1st["D"]?.name || "1° Grupo D",
-      visitante: () => thirdsBySlotId["16v_9"]?.name || "3° B/E/F/I/J"
+      // Bracket I: Bélgica vs Senegal (1G vs 1G_third)
+      local: () => qualified1st["G"]?.name || "1° Grupo G",
+      visitante: () => thirdsBySlotId["16v_9"]?.name || "3° A/E/H/I/J"
     },
     "16v_10": {
-      local: () => qualified1st["G"]?.name || "1° Grupo G",
-      visitante: () => thirdsBySlotId["16v_10"]?.name || "3° A/E/H/I/J"
+      // Bracket J: Estados Unidos vs Bosnia (1D vs 1D_third)
+      local: () => qualified1st["D"]?.name || "1° Grupo D",
+      visitante: () => thirdsBySlotId["16v_10"]?.name || "3° B/E/F/I/J"
     },
     "16v_11": {
-      local: () => qualified2nd["K"]?.name || "2° Grupo K",
-      visitante: () => qualified2nd["L"]?.name || "2° Grupo L"
-    },
-    "16v_12": {
+      // Bracket K: España vs Austria (1H vs 2J)
       local: () => qualified1st["H"]?.name || "1° Grupo H",
       visitante: () => qualified2nd["J"]?.name || "2° Grupo J"
     },
+    "16v_12": {
+      // Bracket L: Portugal vs Croacia (2K vs 2L)
+      local: () => qualified2nd["K"]?.name || "2° Grupo K",
+      visitante: () => qualified2nd["L"]?.name || "2° Grupo L"
+    },
     "16v_13": {
+      // Bracket M: Suiza vs Argelia (1B vs 1B_third)
       local: () => qualified1st["B"]?.name || "1° Grupo B",
       visitante: () => thirdsBySlotId["16v_13"]?.name || "3° E/F/G/I/J"
     },
     "16v_14": {
+      // Bracket N: Australia vs Egipto (2D vs 2G)
+      local: () => qualified2nd["D"]?.name || "2° Grupo D",
+      visitante: () => qualified2nd["G"]?.name || "2° Grupo G"
+    },
+    "16v_15": {
+      // Bracket O: Argentina vs Cabo Verde (1J vs 2H)
       local: () => qualified1st["J"]?.name || "1° Grupo J",
       visitante: () => qualified2nd["H"]?.name || "2° Grupo H"
     },
-    "16v_15": {
-      local: () => qualified1st["K"]?.name || "1° Grupo K",
-      visitante: () => thirdsBySlotId["16v_15"]?.name || "3° D/E/I/J/L"
-    },
     "16v_16": {
-      local: () => qualified2nd["D"]?.name || "2° Grupo D",
-      visitante: () => qualified2nd["G"]?.name || "2° Grupo G"
+      // Bracket P: Colombia vs Ghana (1K vs 1K_third)
+      local: () => qualified1st["K"]?.name || "1° Grupo K",
+      visitante: () => thirdsBySlotId["16v_16"]?.name || "3° D/E/I/J/L"
     }
   };
 
   function createDefaultMatches() {
     const list = [];
+    
+    // 16vos
+    const r32Schedule = [
+      { date: "2026-06-28", time: "14:00" }, // 16v_1
+      { date: "2026-06-29", time: "12:00" }, // 16v_2
+      { date: "2026-06-29", time: "15:30" }, // 16v_3
+      { date: "2026-06-29", time: "20:00" }, // 16v_4
+      { date: "2026-06-30", time: "12:00" }, // 16v_5
+      { date: "2026-06-30", time: "16:00" }, // 16v_6
+      { date: "2026-06-30", time: "20:00" }, // 16v_7
+      { date: "2026-07-01", time: "11:00" }, // 16v_8
+      { date: "2026-07-01", time: "15:00" }, // 16v_9
+      { date: "2026-07-01", time: "19:00" }, // 16v_10
+      { date: "2026-07-02", time: "14:00" }, // 16v_11
+      { date: "2026-07-02", time: "18:00" }, // 16v_12
+      { date: "2026-07-02", time: "22:00" }, // 16v_13
+      { date: "2026-07-03", time: "13:00" }, // 16v_14
+      { date: "2026-07-03", time: "17:00" }, // 16v_15
+      { date: "2026-07-03", time: "20:30" }  // 16v_16
+    ];
+
     for (let i = 1; i <= 16; i++) {
+      const schedule = r32Schedule[i - 1];
       list.push({
         id: `16v_${i}`,
         phase: "16vos",
         group: "16VOS",
         local: "",
         visitante: "",
-        date: `2026-06-${27 + Math.ceil(i/4)}`,
-        time: `${12 + (i % 4) * 3}:00`
+        date: schedule.date,
+        time: schedule.time
       });
     }
+
+    // Octavos
+    const r16Schedule = [
+      { date: "2026-07-04", time: "12:00" }, // 8v_1
+      { date: "2026-07-04", time: "16:00" }, // 8v_2
+      { date: "2026-07-05", time: "12:00" }, // 8v_3
+      { date: "2026-07-05", time: "16:00" }, // 8v_4
+      { date: "2026-07-06", time: "12:00" }, // 8v_5
+      { date: "2026-07-06", time: "16:00" }, // 8v_6
+      { date: "2026-07-07", time: "12:00" }, // 8v_7
+      { date: "2026-07-07", time: "16:00" }  // 8v_8
+    ];
+
     for (let i = 1; i <= 8; i++) {
+      const schedule = r16Schedule[i - 1];
       list.push({
         id: `8v_${i}`,
         phase: "octavos",
         group: "OCTAVOS",
         local: "",
         visitante: "",
-        date: `2026-07-${1 + Math.ceil(i/2)}`,
-        time: `${12 + (i % 2) * 4}:00`
+        date: schedule.date,
+        time: schedule.time
       });
     }
+
+    // Cuartos
+    const qfSchedule = [
+      { date: "2026-07-09", time: "15:00" }, // 4v_1
+      { date: "2026-07-10", time: "15:00" }, // 4v_2
+      { date: "2026-07-11", time: "15:00" }, // 4v_3
+      { date: "2026-07-12", time: "15:00" }  // 4v_4
+    ];
+
     for (let i = 1; i <= 4; i++) {
+      const schedule = qfSchedule[i - 1];
       list.push({
         id: `4v_${i}`,
         phase: "cuartos",
         group: "CUARTOS",
         local: "",
         visitante: "",
-        date: `2026-07-${4 + Math.ceil(i/2)}`,
-        time: `${14 + (i % 2) * 4}:00`
+        date: schedule.date,
+        time: schedule.time
       });
     }
+
+    // Semis
+    const sfSchedule = [
+      { date: "2026-07-14", time: "19:00" }, // sf_1
+      { date: "2026-07-15", time: "19:00" }  // sf_2
+    ];
+
     for (let i = 1; i <= 2; i++) {
+      const schedule = sfSchedule[i - 1];
       list.push({
         id: `sf_${i}`,
         phase: "semis",
         group: "SEMIS",
         local: "",
         visitante: "",
-        date: `2026-07-08`,
-        time: `16:00`
+        date: schedule.date,
+        time: schedule.time
       });
     }
+
+    // Finales
     list.push({
       id: "fin_1",
       phase: "final",
       group: "FINAL",
       local: "",
       visitante: "",
-      date: "2026-07-12",
-      time: "16:00"
+      date: "2026-07-19",
+      time: "14:00" // Gran Final: 2:00 PM (COT)
     });
     list.push({
       id: "fin_2",
@@ -779,9 +851,10 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
       group: "FINAL",
       local: "",
       visitante: "",
-      date: "2026-07-11",
-      time: "16:00"
+      date: "2026-07-18",
+      time: "21:00" // Tercer puesto: 9:00 PM (COT)
     });
+
     return list;
   }
 

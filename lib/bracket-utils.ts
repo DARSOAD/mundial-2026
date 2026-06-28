@@ -483,54 +483,100 @@ export function computeKnockoutBracket(
     const list: any[] = [];
     
     // 16vos
+    const r32Schedule = [
+      { date: "2026-06-28", time: "14:00" }, // 16v_1
+      { date: "2026-06-29", time: "12:00" }, // 16v_2
+      { date: "2026-06-29", time: "15:30" }, // 16v_3
+      { date: "2026-06-29", time: "20:00" }, // 16v_4
+      { date: "2026-06-30", time: "12:00" }, // 16v_5
+      { date: "2026-06-30", time: "16:00" }, // 16v_6
+      { date: "2026-06-30", time: "20:00" }, // 16v_7
+      { date: "2026-07-01", time: "11:00" }, // 16v_8
+      { date: "2026-07-01", time: "15:00" }, // 16v_9
+      { date: "2026-07-01", time: "19:00" }, // 16v_10
+      { date: "2026-07-02", time: "14:00" }, // 16v_11
+      { date: "2026-07-02", time: "18:00" }, // 16v_12
+      { date: "2026-07-02", time: "22:00" }, // 16v_13
+      { date: "2026-07-03", time: "13:00" }, // 16v_14
+      { date: "2026-07-03", time: "17:00" }, // 16v_15
+      { date: "2026-07-03", time: "20:30" }  // 16v_16
+    ];
+
     for (let i = 1; i <= 16; i++) {
+      const schedule = r32Schedule[i - 1];
       list.push({
         id: `16v_${i}`,
         phase: "16vos",
         group: "16VOS",
         local: "",
         visitante: "",
-        date: `2026-06-${27 + Math.ceil(i/4)}`,
-        time: `${12 + (i % 4) * 3}:00`
+        date: schedule.date,
+        time: schedule.time
       });
     }
 
     // Octavos
+    const r16Schedule = [
+      { date: "2026-07-04", time: "12:00" }, // 8v_1
+      { date: "2026-07-04", time: "16:00" }, // 8v_2
+      { date: "2026-07-05", time: "12:00" }, // 8v_3
+      { date: "2026-07-05", time: "16:00" }, // 8v_4
+      { date: "2026-07-06", time: "12:00" }, // 8v_5
+      { date: "2026-07-06", time: "16:00" }, // 8v_6
+      { date: "2026-07-07", time: "12:00" }, // 8v_7
+      { date: "2026-07-07", time: "16:00" }  // 8v_8
+    ];
+
     for (let i = 1; i <= 8; i++) {
+      const schedule = r16Schedule[i - 1];
       list.push({
         id: `8v_${i}`,
         phase: "octavos",
         group: "OCTAVOS",
         local: "",
         visitante: "",
-        date: `2026-07-${1 + Math.ceil(i/2)}`,
-        time: `${12 + (i % 2) * 4}:00`
+        date: schedule.date,
+        time: schedule.time
       });
     }
 
     // Cuartos
+    const qfSchedule = [
+      { date: "2026-07-09", time: "15:00" }, // 4v_1
+      { date: "2026-07-10", time: "15:00" }, // 4v_2
+      { date: "2026-07-11", time: "15:00" }, // 4v_3
+      { date: "2026-07-12", time: "15:00" }  // 4v_4
+    ];
+
     for (let i = 1; i <= 4; i++) {
+      const schedule = qfSchedule[i - 1];
       list.push({
         id: `4v_${i}`,
         phase: "cuartos",
         group: "CUARTOS",
         local: "",
         visitante: "",
-        date: `2026-07-${4 + Math.ceil(i/2)}`,
-        time: `${14 + (i % 2) * 4}:00`
+        date: schedule.date,
+        time: schedule.time
       });
     }
 
     // Semis
+    const sfSchedule = [
+      { date: "2026-07-14", time: "19:00" }, // sf_1
+      { date: "2026-07-15", time: "19:00" }  // sf_2
+    ];
+
     for (let i = 1; i <= 2; i++) {
+      const schedule = sfSchedule[i - 1];
       list.push({
         id: `sf_${i}`,
         phase: "semis",
         group: "SEMIS",
         local: "",
         visitante: "",
-        date: `2026-07-08`,
-        time: `16:00`
+        date: schedule.date,
+        time: schedule.time
       });
     }
 
@@ -541,8 +587,8 @@ export function computeKnockoutBracket(
       group: "FINAL",
       local: "",
       visitante: "",
-      date: "2026-07-12",
-      time: "16:00"
+      date: "2026-07-19",
+      time: "14:00" // Gran Final: 2:00 PM (COT)
     });
     list.push({
       id: "fin_2",
@@ -550,8 +596,8 @@ export function computeKnockoutBracket(
       group: "FINAL",
       local: "",
       visitante: "",
-      date: "2026-07-11",
-      time: "16:00"
+      date: "2026-07-18",
+      time: "21:00" // Tercer puesto: 9:00 PM (COT)
     });
 
     return list;
