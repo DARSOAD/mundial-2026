@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getFlag } from "@/lib/flags";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function EditUserForm({ user, allMatches }: { user: any, allMatches: any[] }) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
-  const [preds, setPreds] = useState<Record<string, any>>(user.predictions);
+  const [preds, setPreds] = useState<Record<string, any>>(user.predictions || {});
   const [finals, setFinals] = useState(user.finals || { campeon: "", subcampeon: "", tercer_lugar: "", cuarto_lugar: "" });
 
   const handleMatchChange = (matchId: string, field: 'goles_local' | 'goles_visitante', value: string) => {
@@ -21,14 +23,68 @@ export default function EditUserForm({ user, allMatches }: { user: any, allMatch
     }));
   };
 
+  const handlePenaltyChange = (matchId: string, value: 'home' | 'away') => {
+    setPreds(prev => ({
+      ...prev,
+      [matchId]: {
+        ...(prev[matchId] || {}),
+        team_passes: value
+      }
+    }));
+  };
+
   const handleFinalsChange = (field: string, value: string) => {
     setFinals((prev: Record<string, string>) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async () => {
     setIsSaving(true);
-    alert("Las predicciones son de solo lectura. Ya no se pueden modificar.");
-    setIsSaving(false);
+    
+    // Separate groupPredictions and knockoutPredictions
+    const groupPredictions: Record<string, any> = {};
+    const knockoutPredictions: Record<string, any> = {};
+
+    Object.entries(preds).forEach(([mId, pred]) => {
+      const isKnockout = mId.includes("v_") || mId.startsWith("sf_") || mId.startsWith("fin_");
+      if (isKnockout) {
+        knockoutPredictions[mId] = {
+          goles_local: pred.goles_local,
+          goles_visitante: pred.goles_visitante,
+          team_passes: pred.team_passes || null
+        };
+      } else {
+        groupPredictions[mId] = {
+          goles_local: pred.goles_local,
+          goles_visitante: pred.goles_visitante
+        };
+      }
+    });
+
+    try {
+      const res = await fetch(`${API_URL}/manage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "adminSaveUserPredictions",
+          adminId: "diego",
+          targetUserId: user.userId,
+          groupPredictions,
+          knockoutPredictions,
+          finals
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("¡Predicciones guardadas correctamente!");
+        router.push("/admin");
+      } else {
+        alert("Error al guardar: " + (data.error || "Error desconocido"));
+      }
+    } catch (e: any) {
+      alert("Error de red: " + e.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -76,10 +132,12 @@ export default function EditUserForm({ user, allMatches }: { user: any, allMatch
             {allMatches.map(m => {
               const matchPred = preds[m.id] || { local: m.local, visitante: m.visitante, goles_local: null, goles_visitante: null };
               const isMissing = matchPred.goles_local === null || matchPred.goles_visitante === null;
+              const isKnockout = m.id.includes("v_") || m.id.startsWith("sf_") || m.id.startsWith("fin_");
+              const isTie = matchPred.goles_local != null && matchPred.goles_visitante != null && matchPred.goles_local === matchPred.goles_visitante;
 
               return (
                 <div key={m.id} className={`flex flex-col p-4 rounded-xl border transition-colors ${isMissing ? 'border-red-500/50 bg-red-500/5' : 'border-white/5 bg-[#0f1115]'}`}>
-                  <p className="text-[8px] font-black uppercase text-white/30 tracking-[0.2em] mb-3">{m.date} • GRUPO {m.group}</p>
+                  <p className="text-[8px] font-black uppercase text-white/30 tracking-[0.2em] mb-3">{m.date} • {isKnockout ? m.group : `GRUPO ${m.group}`}</p>
                   
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex flex-col gap-2 flex-1">
@@ -110,6 +168,27 @@ export default function EditUserForm({ user, allMatches }: { user: any, allMatch
                       />
                     </div>
                   </div>
+
+                  {isKnockout && isTie && (
+                    <div className="mt-2 flex gap-1">
+                      <button
+                        onClick={() => handlePenaltyChange(m.id, 'home')}
+                        className={`flex-1 text-[8px] font-black uppercase py-1 rounded transition-all ${
+                          matchPred.team_passes === 'home' ? 'bg-yellow-500 text-black' : 'bg-white/5 text-white/40'
+                        }`}
+                      >
+                        Pasa {m.local}
+                      </button>
+                      <button
+                        onClick={() => handlePenaltyChange(m.id, 'away')}
+                        className={`flex-1 text-[8px] font-black uppercase py-1 rounded transition-all ${
+                          matchPred.team_passes === 'away' ? 'bg-yellow-500 text-black' : 'bg-white/5 text-white/40'
+                        }`}
+                      >
+                        Pasa {m.visitante}
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}

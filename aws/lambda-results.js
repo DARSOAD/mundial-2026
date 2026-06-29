@@ -275,6 +275,62 @@ export const handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
+    // ===================== adminSaveUserPredictions (admin only, edit any user predictions/finals) =====================
+    if (action === "adminSaveUserPredictions") {
+      const { adminId, targetUserId, groupPredictions, knockoutPredictions, finals } = body;
+      if (!adminId || adminId !== "diego") {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
+      }
+      if (!targetUserId) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Falta targetUserId" }) };
+      }
+
+      // 1. Update group predictions and finals in predicciones.json
+      const predictionsList = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`)) || [];
+      const userIndex = predictionsList.findIndex(u => u.participante.toLowerCase().replace(/\s+/g, '_') === targetUserId);
+      if (userIndex === -1) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: "Usuario no encontrado" }) };
+      }
+
+      const userObj = predictionsList[userIndex];
+      
+      // Update group predictions if provided
+      if (groupPredictions && typeof groupPredictions === "object") {
+        if (!userObj.predicciones_partidos) userObj.predicciones_partidos = {};
+        Object.entries(groupPredictions).forEach(([mId, pred]) => {
+          if (!userObj.predicciones_partidos[mId]) {
+            userObj.predicciones_partidos[mId] = {};
+          }
+          userObj.predicciones_partidos[mId].goles_local = pred.goles_local;
+          userObj.predicciones_partidos[mId].goles_visitante = pred.goles_visitante;
+        });
+      }
+
+      // Update finals if provided
+      if (finals && typeof finals === "object") {
+        userObj.predicciones_finales = finals;
+      }
+
+      predictionsList[userIndex] = userObj;
+      await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`, predictionsList);
+      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones.json`]);
+
+      // 2. Update knockout predictions in predicciones-eliminatorias.json
+      if (knockoutPredictions && typeof knockoutPredictions === "object") {
+        const knockoutList = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`)) || {};
+        if (!knockoutList[targetUserId]) knockoutList[targetUserId] = {};
+        
+        Object.entries(knockoutPredictions).forEach(([mId, pred]) => {
+          knockoutList[targetUserId][mId] = pred;
+        });
+
+        await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`, knockoutList);
+        await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones-eliminatorias.json`]);
+      }
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
     // ===================== saveSettings (admin only) =====================
     // body.settings = { activePhases: ["grupos", "16vos"] }
     if (action === "saveSettings") {

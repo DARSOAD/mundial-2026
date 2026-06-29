@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getParticipants } from "@/lib/data";
+import { getParticipants, getKnockoutMatches } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
 import { notFound } from "next/navigation";
 import EditUserForm from "./edit-client";
@@ -14,10 +14,11 @@ export default function EditUserClientPage({ id }: { id: string }) {
 
   useEffect(() => {
     async function load() {
-      const [u, participants, m] = await Promise.all([
+      const [u, participants, m, km] = await Promise.all([
         getLoggedInUser(),
         getParticipants(),
-        getAllMatches()
+        getAllMatches(),
+        getKnockoutMatches()
       ]);
 
       if (!u || u.userId !== 'diego') {
@@ -31,8 +32,22 @@ export default function EditUserClientPage({ id }: { id: string }) {
         return;
       }
 
+      // Map knockout matches to match structure
+      const mappedKnockouts = km.map((m: any) => ({
+        id: m.id,
+        local: m.local || "Por Definir",
+        visitante: m.visitante || "Por Definir",
+        date: m.date,
+        time: m.time,
+        group: m.group || m.phase.toUpperCase(),
+        order: 1000 + parseInt(m.id.split('_')[1] || '0', 10),
+        homeIsPredLocal: true,
+        calendarHome: m.local,
+        calendarAway: m.visitante
+      }));
+
       setUserToEdit(target);
-      setAllMatches(m);
+      setAllMatches([...m, ...mappedKnockouts]);
       setIsLoading(false);
     }
     load();
