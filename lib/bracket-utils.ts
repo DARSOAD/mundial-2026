@@ -611,11 +611,17 @@ export function computeKnockoutBracket(
     matchesMap[m.id] = m;
   });
 
-  // Sobrescribir con lo que ya exista en base de datos/S3
+  // Sobrescribir con lo que ya exista en base de datos/S3, pero forzando los horarios oficiales de los partidos por defecto
   if (Array.isArray(existingKnockoutMatches) && existingKnockoutMatches.length > 0) {
     existingKnockoutMatches.forEach(m => {
       if (m && m.id) {
-        matchesMap[m.id] = { ...matchesMap[m.id], ...m };
+        const defaultMatch = matchesMap[m.id];
+        matchesMap[m.id] = {
+          ...defaultMatch,
+          ...m,
+          date: defaultMatch ? defaultMatch.date : m.date,
+          time: defaultMatch ? defaultMatch.time : m.time
+        };
       }
     });
   }

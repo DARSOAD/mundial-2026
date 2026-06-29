@@ -867,7 +867,13 @@ function computeKnockoutBracket(calendario, resultados, existingKnockoutMatches)
   if (Array.isArray(existingKnockoutMatches) && existingKnockoutMatches.length > 0) {
     existingKnockoutMatches.forEach(m => {
       if (m && m.id) {
-        matchesMap[m.id] = { ...matchesMap[m.id], ...m };
+        const defaultMatch = matchesMap[m.id];
+        matchesMap[m.id] = {
+          ...defaultMatch,
+          ...m,
+          date: defaultMatch ? defaultMatch.date : m.date,
+          time: defaultMatch ? defaultMatch.time : m.time
+        };
       }
     });
   }
