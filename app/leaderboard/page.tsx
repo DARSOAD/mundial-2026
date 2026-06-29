@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getResults, getParticipants } from "@/lib/data";
+import { getResults, getParticipants, getKnockoutMatches } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
 import { getDetailedPoints, MatchResult } from "@/lib/scoring";
 
@@ -12,13 +12,28 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     async function load() {
-      const [results, participants, m] = await Promise.all([
+      const [results, participants, m, km] = await Promise.all([
         getResults(),
         getParticipants(),
-        getAllMatches()
+        getAllMatches(),
+        getKnockoutMatches()
       ]);
+      
+      const mappedKnockouts = km.map((m: any) => ({
+        id: m.id,
+        local: m.local || "Por Definir",
+        visitante: m.visitante || "Por Definir",
+        date: m.date,
+        time: m.time,
+        group: m.group || m.phase.toUpperCase(),
+        order: 1000 + parseInt(m.id.split('_')[1] || '0', 10),
+        homeIsPredLocal: true,
+        calendarHome: m.local,
+        calendarAway: m.visitante
+      }));
+
       setData({ participants, realResults: results });
-      setMatches(m);
+      setMatches([...m, ...mappedKnockouts]);
       setIsLoading(false);
     }
     load();
