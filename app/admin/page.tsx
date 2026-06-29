@@ -6,6 +6,8 @@ import { getParticipants } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
 import Link from "next/link";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function AdminPage() {
   const [user, setUser] = useState<any>(null);
   const [data, setData] = useState<any>(null);
@@ -33,10 +35,33 @@ export default function AdminPage() {
     load();
   }, []);
 
+  const handleRename = async (oldUserId: string, newName: string) => {
+    try {
+      const res = await fetch(`${API_URL}/manage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "renameUser",
+          adminId: "diego",
+          oldUserId,
+          newName
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Usuario renombrado con éxito. Recargando...");
+        window.location.reload();
+      } else {
+        alert("Error al renombrar: " + (data.error || "Error desconocido"));
+      }
+    } catch (e: any) {
+      alert("Error de red: " + e.message);
+    }
+  };
+
   if (isLoading) return <div className="min-h-screen flex items-center justify-center font-black text-red-500 uppercase tracking-widest animate-pulse">Verificando Admin...</div>;
 
   const participants = data.participants;
-  const activePhases = ["grupos"];
 
   const usersWithStatus = participants.map((p: any) => {
     let missingMatches = 0;
@@ -74,7 +99,20 @@ export default function AdminPage() {
                   <p className="font-bold">{u.name}</p>
                   <p className="text-[10px] text-white/40 uppercase">Partidos: {u.missingMatches} faltantes | Finales: {u.missingFinals} faltantes</p>
                 </div>
-                <Link href={`/admin/edit/?id=${u.userId}`} className="bg-white/10 px-4 py-2 rounded-lg font-bold text-[10px] uppercase">Editar</Link>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => {
+                      const newName = prompt("Ingresa el nuevo nombre para " + u.name, u.name);
+                      if (newName && newName !== u.name) {
+                        handleRename(u.userId, newName);
+                      }
+                    }}
+                    className="bg-white/5 border border-white/10 px-3 py-2 rounded-lg font-bold text-[10px] uppercase hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                  >
+                    ✏️ Renombrar
+                  </button>
+                  <Link href={`/admin/edit/?id=${u.userId}`} className="bg-white/10 px-4 py-2 rounded-lg font-bold text-[10px] uppercase hover:bg-yellow-500 hover:text-black transition-all">Editar</Link>
+                </div>
               </div>
             ))}
           </div>
