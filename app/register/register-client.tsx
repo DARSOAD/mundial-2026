@@ -42,7 +42,12 @@ export default function RegisterClient() {
           const pred = p.predictions[matchId];
           if (pred) {
             const matchData = matches.find(m => m.id === matchId);
-            const points = getDetailedPoints(pred, { ...results[matchId], group: matchData?.group });
+            const points = getDetailedPoints(pred, { 
+              ...results[matchId], 
+              group: matchData?.group,
+              local: matchData?.local,
+              visitante: matchData?.visitante
+            });
             totalPoints += points.totalPoints || 0;
           }
         });

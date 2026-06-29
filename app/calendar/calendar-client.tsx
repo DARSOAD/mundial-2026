@@ -69,7 +69,7 @@ export default function CalendarClient({ participants, matches, results, current
                 const singleUserObj = filteredParticipants[0];
                 const pred = singleUserObj.predictions[m.id];
                 if (pred && hasResult) {
-                  matchPoints = getDetailedPoints(pred, { ...res, group: m.group }).totalPoints || 0;
+                  matchPoints = getDetailedPoints(pred, { ...res, group: m.group, local: m.local, visitante: m.visitante }).totalPoints || 0;
                   runningSum += matchPoints;
                   showPointsColumn = true;
                 }

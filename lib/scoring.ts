@@ -13,13 +13,15 @@ export interface MatchResult {
   status: 'live' | 'finished' | 'scheduled';
   group?: string; // Para saber si es fase de grupos o eliminatoria
   teamPasses?: 'home' | 'away' | null; // Quien pasa en caso de penales en eliminatorias
+  local?: string;
+  visitante?: string;
 }
 
 export interface Prediction {
   goles_local: number | null;
   goles_visitante: number | null;
-  local: string;
-  visitante: string;
+  local?: string;
+  visitante?: string;
   team_passes?: 'home' | 'away' | null;
 }
 
@@ -39,9 +41,12 @@ export function getDetailedPoints(prediction: Prediction, result: MatchResult): 
   const { goles_local: pLocal, goles_visitante: pVisitante, local, visitante } = prediction;
   const { homeGoals: rLocal, awayGoals: rVisitante, group, teamPasses } = result;
 
+  const localName = local || result.local || "";
+  const visitanteName = visitante || result.visitante || "";
+
   const isKnockout = group ? KNOCKOUT_GROUPS.includes(group) : false;
-  const isColombia = local === "Colombia" || visitante === "Colombia";
-  const isSouthAmerica = SOUTH_AMERICAN_TEAMS.includes(local) || SOUTH_AMERICAN_TEAMS.includes(visitante);
+  const isColombia = localName === "Colombia" || visitanteName === "Colombia";
+  const isSouthAmerica = SOUTH_AMERICAN_TEAMS.includes(localName) || SOUTH_AMERICAN_TEAMS.includes(visitanteName);
 
   // 1. RESULTADO EXACTO (Mismos goles)
   // Las reglas de Exacto son las mismas para Grupos y Eliminatorias en cuanto a puntaje:

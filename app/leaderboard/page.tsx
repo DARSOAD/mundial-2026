@@ -53,7 +53,12 @@ export default function LeaderboardPage() {
       const pred = p.predictions[matchId];
       if (pred) {
         const matchData = matches.find(m => m.id === matchId);
-        const resultWithGroup = { ...realResults[matchId], group: matchData?.group };
+        const resultWithGroup = { 
+          ...realResults[matchId], 
+          group: matchData?.group,
+          local: matchData?.local,
+          visitante: matchData?.visitante
+        };
         const points = getDetailedPoints(pred, resultWithGroup);
         breakdown.exactColombia += points.exactColombia || 0;
         breakdown.exactSouthAmerica += points.exactSouthAmerica || 0;
