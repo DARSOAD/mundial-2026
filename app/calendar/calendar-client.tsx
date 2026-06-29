@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { getFlag } from "@/lib/flags";
+import { getDetailedPoints } from "@/lib/scoring";
 
 export default function CalendarClient({ participants, matches, results, currentUser }: any) {
   const [filterUser, setFilterUser] = useState(currentUser ? currentUser.userId : "");
@@ -9,6 +10,9 @@ export default function CalendarClient({ participants, matches, results, current
   const filteredParticipants = filterUser 
     ? participants.filter((p: any) => p.userId === filterUser)
     : participants;
+
+  const isSingleUser = !!filterUser && filteredParticipants.length === 1;
+  let runningSum = 0;
 
   return (
     <div className="max-w-[1600px] mx-auto py-12 px-4">
@@ -46,11 +50,31 @@ export default function CalendarClient({ participants, matches, results, current
                   {p.name.substring(0, 10)}
                 </th>
               ))}
+              {isSingleUser && (
+                <th className="px-2 py-3 md:p-6 text-[11px] md:text-xs font-black uppercase tracking-widest text-yellow-500 text-center border-l border-white/5 w-32 whitespace-nowrap">
+                  Puntos (Acumulado)
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {matches.map((m: any) => {
               const res = results[m.id];
+              const hasResult = res && res.homeGoals != null && res.awayGoals != null;
+
+              let matchPoints = 0;
+              let showPointsColumn = false;
+
+              if (isSingleUser) {
+                const singleUserObj = filteredParticipants[0];
+                const pred = singleUserObj.predictions[m.id];
+                if (pred && hasResult) {
+                  matchPoints = getDetailedPoints(pred, { ...res, group: m.group }).totalPoints || 0;
+                  runningSum += matchPoints;
+                  showPointsColumn = true;
+                }
+              }
+
               return (
                 <tr key={m.id} className="hover:bg-white/[0.02] transition-colors group">
                   <td className="px-3 py-3 md:p-4 sticky left-0 bg-[#0f1115] z-10 border-r border-white/5 group-hover:bg-white/[0.05]">
@@ -67,7 +91,7 @@ export default function CalendarClient({ participants, matches, results, current
                     </div>
                   </td>
                   <td className="px-2 py-3 md:p-6 text-center font-black text-sm md:text-base font-montserrat border-r border-white/5 bg-white/5 text-white">
-                    {res ? `${res.homeGoals}-${res.awayGoals}` : '-'}
+                    {hasResult ? `${res.homeGoals}-${res.awayGoals}` : '-'}
                   </td>
                   {filteredParticipants.map((p: any) => {
                     const pred = p.predictions[m.id];
@@ -79,6 +103,11 @@ export default function CalendarClient({ participants, matches, results, current
                       </td>
                     );
                   })}
+                  {isSingleUser && (
+                    <td className="px-2 py-3 md:p-6 text-center font-black text-xs md:text-sm border-l border-white/5 bg-yellow-500/5 text-yellow-500">
+                      {showPointsColumn ? `+${matchPoints} (${runningSum} pts)` : "-"}
+                    </td>
+                  )}
                 </tr>
               );
             })}
