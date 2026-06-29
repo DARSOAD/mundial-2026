@@ -331,6 +331,40 @@ export const handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
+    // ===================== renameUser (admin only) =====================
+    if (action === "renameUser") {
+      const { adminId, oldUserId, newName } = body;
+      if (!adminId || adminId !== "diego") {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "No autorizado" }) };
+      }
+      if (!oldUserId || !newName) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Faltan datos" }) };
+      }
+      const newUserId = newName.toLowerCase().replace(/\s+/g, '_');
+
+      // 1. Update predicciones.json
+      const predictionsList = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`)) || [];
+      const userIndex = predictionsList.findIndex(u => u.participante.toLowerCase().replace(/\s+/g, '_') === oldUserId);
+      if (userIndex === -1) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: "Usuario no encontrado" }) };
+      }
+
+      predictionsList[userIndex].participante = newName;
+      await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones.json`, predictionsList);
+      await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones.json`]);
+
+      // 2. Update predicciones-eliminatorias.json
+      const knockoutList = (await readJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`)) || {};
+      if (knockoutList[oldUserId]) {
+        knockoutList[newUserId] = knockoutList[oldUserId];
+        delete knockoutList[oldUserId];
+        await writeJSON(BUCKET_NAME, `${PREFIX}/predicciones-eliminatorias.json`, knockoutList);
+        await invalidate(CLOUDFRONT_DISTRIBUTION_ID, [`/${PREFIX}/predicciones-eliminatorias.json`]);
+      }
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
     // ===================== saveSettings (admin only) =====================
     // body.settings = { activePhases: ["grupos", "16vos"] }
     if (action === "saveSettings") {
