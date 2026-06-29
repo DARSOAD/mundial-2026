@@ -74,9 +74,7 @@ export function getDetailedPoints(prediction: Prediction, result: MatchResult): 
     }
 
     if (predictionPasses && predictionPasses === actualPasses) {
-      if (isColombia) return { winnerResult: 1, totalPoints: 3 };
-      if (isSouthAmerica) return { winnerResult: 1, totalPoints: 3 };
-      return { winnerResult: 1, totalPoints: 2 };
+      return { winnerResult: 1, totalPoints: 1 };
     }
   } else {
     // REGLA FASE DE GRUPOS: Acertar Ganador o Empate

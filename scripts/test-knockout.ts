@@ -14,7 +14,7 @@ async function simulateKnockout() {
 
   // Simulación: Diego puso Brasil 1 - 0 Alemania (Pasa Brasil)
   // Resultado Real: Brasil 2 - 0 Alemania (Pasa Brasil)
-  // Expectativa: Equipo que pasa (Suramericano) -> 3 pts
+  // Expectativa: Equipo que pasa -> 1 pt
 
   const mockPredictionExact = { goles_local: 2, goles_visitante: 1, local: "México", visitante: "Canadá" };
   const mockResultExact: MatchResult = { homeGoals: 2, awayGoals: 1, status: 'finished', group: '16VOS' };
@@ -30,7 +30,7 @@ async function simulateKnockout() {
   console.log("Prueba 2: Acierto Quien Pasa (Suramericano)");
   console.log("Predicción: BRA 1-0 ALE (Pasa BRA) | Real: BRA 2-0 ALE (Pasa BRA)");
   const res2 = getDetailedPoints(mockPredictionPass, mockResultPass);
-  console.log(`Puntos obtenidos: ${res2.totalPoints} (Esperado: 3)\n`);
+  console.log(`Puntos obtenidos: ${res2.totalPoints} (Esperado: 1)\n`);
 
   // Prueba Colombia
   const mockPredictionCol = { goles_local: 2, goles_visitante: 0, local: "Colombia", visitante: "España" };
@@ -45,7 +45,7 @@ async function simulateKnockout() {
   console.log("Prueba 4: Colombia Quien Pasa");
   console.log("Predicción: COL 2-0 ESP (Pasa COL) | Real: COL 1-0 ESP (Pasa COL)");
   const res4 = getDetailedPoints(mockPredictionCol, mockResultColPass);
-  console.log(`Puntos obtenidos: ${res4.totalPoints} (Esperado: 3)\n`);
+  console.log(`Puntos obtenidos: ${res4.totalPoints} (Esperado: 1)\n`);
 }
 
 simulateKnockout();
