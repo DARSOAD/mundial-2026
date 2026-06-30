@@ -148,7 +148,7 @@
     "phase": "octavos",
     "group": "OCTAVOS",
     "local": "Ganador 16vos 1",
-    "visitante": "Ganador 16vos 2",
+    "visitante": "Ganador 16vos 4",
     "date": "2026-07-04",
     "time": "12:00"
   },
@@ -157,7 +157,7 @@
     "phase": "octavos",
     "group": "OCTAVOS",
     "local": "Ganador 16vos 3",
-    "visitante": "Ganador 16vos 4",
+    "visitante": "Ganador 16vos 6",
     "date": "2026-07-04",
     "time": "16:00"
   },
@@ -165,8 +165,8 @@
     "id": "8v_3",
     "phase": "octavos",
     "group": "OCTAVOS",
-    "local": "Ganador 16vos 5",
-    "visitante": "Ganador 16vos 6",
+    "local": "Ganador 16vos 2",
+    "visitante": "Ganador 16vos 5",
     "date": "2026-07-05",
     "time": "12:00"
   },

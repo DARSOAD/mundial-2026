@@ -52,6 +52,12 @@ async function verify() {
     }
   });
 
+  console.log("\n=== 4. VERIFICACIÓN DE PARTIDOS DE OCTAVOS ===");
+  const r16Matches = bracket.filter(m => m.phase === "octavos");
+  r16Matches.forEach(m => {
+    console.log(`  ${m.id}: ${m.local} vs ${m.visitante}`);
+  });
+
   if (errors === 0) {
     console.log("\n✅ ¡Éxito! Ningún equipo se enfrenta a un rival de su mismo grupo en los 16vos de final.");
   } else {
