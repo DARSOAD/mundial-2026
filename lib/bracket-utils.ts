@@ -668,14 +668,14 @@ export function computeKnockoutBracket(
 
   // 5. Propagar Octavos (8v_1 a 8v_8)
   const octavosPairings: [string, string][] = [
-    ["16v_1", "16v_4"], // Canada vs Marruecos
-    ["16v_3", "16v_6"], // Paraguay vs Francia
-    ["16v_2", "16v_5"], // Brasil vs Noruega
-    ["16v_7", "16v_8"],
-    ["16v_9", "16v_10"],
-    ["16v_11", "16v_12"],
-    ["16v_13", "16v_14"],
-    ["16v_15", "16v_16"]
+    ["16v_1", "16v_4"],   // 8v_1: Canada vs Marruecos
+    ["16v_3", "16v_6"],   // 8v_2: Paraguay vs Francia
+    ["16v_2", "16v_5"],   // 8v_3: Brasil vs Noruega
+    ["16v_7", "16v_8"],   // 8v_4: Mexico/Ecuador vs Inglaterra/Congo
+    ["16v_9", "16v_10"],  // 8v_5: Belgica/Senegal vs USA/Bosnia
+    ["16v_11", "16v_12"], // 8v_6: Espana/Austria vs Portugal/Croacia
+    ["16v_14", "16v_15"], // 8v_7: Australia/Egipto vs Argentina/Cabo Verde
+    ["16v_13", "16v_16"]  // 8v_8: Suiza/Argelia vs Colombia/Ghana
   ];
 
   for (let i = 1; i <= 8; i++) {
