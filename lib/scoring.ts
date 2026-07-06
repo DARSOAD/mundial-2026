@@ -8,8 +8,8 @@ const SOUTH_AMERICAN_TEAMS = [
 const KNOCKOUT_GROUPS = ["16VOS", "OCTAVOS", "CUARTOS", "SEMIS", "FINAL"];
 
 export interface MatchResult {
-  homeGoals: number;
-  awayGoals: number;
+  homeGoals: number | null;
+  awayGoals: number | null;
   status: 'live' | 'finished' | 'scheduled';
   group?: string; // Para saber si es fase de grupos o eliminatoria
   teamPasses?: 'home' | 'away' | null; // Quien pasa en caso de penales en eliminatorias
@@ -34,7 +34,15 @@ export interface PointsBreakdown {
 }
 
 export function getDetailedPoints(prediction: Prediction, result: MatchResult): Partial<PointsBreakdown> {
-  if (result.status === 'scheduled' || prediction.goles_local === null || prediction.goles_visitante === null) {
+  if (
+    result.status === 'scheduled' ||
+    prediction.goles_local === null ||
+    prediction.goles_visitante === null ||
+    result.homeGoals === null ||
+    result.awayGoals === null ||
+    result.homeGoals === undefined ||
+    result.awayGoals === undefined
+  ) {
     return { totalPoints: 0 };
   }
 
