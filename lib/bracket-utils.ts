@@ -564,7 +564,7 @@ export function computeKnockoutBracket(
     // Semis
     const sfSchedule = [
       { date: "2026-07-14", time: "19:00" }, // sf_1
-      { date: "2026-07-15", time: "19:00" }  // sf_2
+      { date: "2026-07-15", time: "18:00" }  // sf_2
     ];
 
     for (let i = 1; i <= 2; i++) {
@@ -597,7 +597,7 @@ export function computeKnockoutBracket(
       local: "",
       visitante: "",
       date: "2026-07-18",
-      time: "21:00" // Tercer puesto: 9:00 PM (COT)
+      time: "20:00" // Tercer puesto: 8:00 PM (COT)
     });
 
     return list;
@@ -697,12 +697,15 @@ export function computeKnockoutBracket(
   }
 
   // 7. Propagar Semifinales (sf_1 y sf_2)
-  for (let i = 1; i <= 2; i++) {
-    const m = matchesMap[`sf_${i}`];
-    if (m) {
-      m.local = getWinner(`4v_${(i-1)*2 + 1}`);
-      m.visitante = getWinner(`4v_${(i-1)*2 + 2}`);
-    }
+  const sf1 = matchesMap["sf_1"];
+  if (sf1) {
+    sf1.local = getWinner("4v_1");
+    sf1.visitante = getWinner("4v_3");
+  }
+  const sf2 = matchesMap["sf_2"];
+  if (sf2) {
+    sf2.local = getWinner("4v_2");
+    sf2.visitante = getWinner("4v_4");
   }
 
   // 8. Propagar Gran Final y 3er Puesto
