@@ -100,3 +100,129 @@ export function getDetailedPoints(prediction: Prediction, result: MatchResult): 
 export function calculateMatchPoints(prediction: Prediction, result: MatchResult): number {
   return getDetailedPoints(prediction, result).totalPoints || 0;
 }
+
+export interface Podium {
+  campeon: string | null;
+  subcampeon: string | null;
+  tercer_lugar: string | null;
+  cuarto_lugar: string | null;
+}
+
+export interface FinalsPointsBreakdown {
+  campeon: number;
+  subcampeon: number;
+  tercer_lugar: number;
+  cuarto_lugar: number;
+  totalPoints: number;
+}
+
+export function getActualPodium(matches: any[], realResults: Record<string, any>): Podium {
+  const fin1Match = matches.find(m => m.id === "fin_1");
+  const fin2Match = matches.find(m => m.id === "fin_2");
+
+  const podium: Podium = {
+    campeon: null,
+    subcampeon: null,
+    tercer_lugar: null,
+    cuarto_lugar: null
+  };
+
+  if (fin1Match) {
+    const res1 = realResults["fin_1"];
+    const hasRes1 = res1 && res1.homeGoals != null && res1.awayGoals != null;
+    if (hasRes1 && fin1Match.local && fin1Match.visitante) {
+      if (res1.homeGoals > res1.awayGoals) {
+        podium.campeon = fin1Match.local;
+        podium.subcampeon = fin1Match.visitante;
+      } else if (res1.awayGoals > res1.homeGoals) {
+        podium.campeon = fin1Match.visitante;
+        podium.subcampeon = fin1Match.local;
+      } else if (res1.teamPasses === "home") {
+        podium.campeon = fin1Match.local;
+        podium.subcampeon = fin1Match.visitante;
+      } else if (res1.teamPasses === "away") {
+        podium.campeon = fin1Match.visitante;
+        podium.subcampeon = fin1Match.local;
+      }
+    }
+  }
+
+  if (fin2Match) {
+    const res2 = realResults["fin_2"];
+    const hasRes2 = res2 && res2.homeGoals != null && res2.awayGoals != null;
+    if (hasRes2 && fin2Match.local && fin2Match.visitante) {
+      if (res2.homeGoals > res2.awayGoals) {
+        podium.tercer_lugar = fin2Match.local;
+        podium.cuarto_lugar = fin2Match.visitante;
+      } else if (res2.awayGoals > res2.homeGoals) {
+        podium.tercer_lugar = fin2Match.visitante;
+        podium.cuarto_lugar = fin2Match.local;
+      } else if (res2.teamPasses === "home") {
+        podium.tercer_lugar = fin2Match.local;
+        podium.cuarto_lugar = fin2Match.visitante;
+      } else if (res2.teamPasses === "away") {
+        podium.tercer_lugar = fin2Match.visitante;
+        podium.cuarto_lugar = fin2Match.local;
+      }
+    }
+  }
+
+  return podium;
+}
+
+export function getFinalsPoints(userFinals: Record<string, string>, actualPodium: Podium): FinalsPointsBreakdown {
+  const breakdown = {
+    campeon: 0,
+    subcampeon: 0,
+    tercer_lugar: 0,
+    cuarto_lugar: 0,
+    totalPoints: 0
+  };
+
+  const normalize = (name: string | null | undefined) => {
+    if (!name) return "";
+    return name
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  };
+
+  const ptsConfig = {
+    campeon: 9,
+    subcampeon: 6,
+    tercer_lugar: 3,
+    cuarto_lugar: 0
+  };
+
+  if (actualPodium.campeon && userFinals.campeon) {
+    if (normalize(userFinals.campeon) === normalize(actualPodium.campeon)) {
+      breakdown.campeon = ptsConfig.campeon;
+      breakdown.totalPoints += ptsConfig.campeon;
+    }
+  }
+
+  if (actualPodium.subcampeon && userFinals.subcampeon) {
+    if (normalize(userFinals.subcampeon) === normalize(actualPodium.subcampeon)) {
+      breakdown.subcampeon = ptsConfig.subcampeon;
+      breakdown.totalPoints += ptsConfig.subcampeon;
+    }
+  }
+
+  if (actualPodium.tercer_lugar && userFinals.tercer_lugar) {
+    if (normalize(userFinals.tercer_lugar) === normalize(actualPodium.tercer_lugar)) {
+      breakdown.tercer_lugar = ptsConfig.tercer_lugar;
+      breakdown.totalPoints += ptsConfig.tercer_lugar;
+    }
+  }
+
+  if (actualPodium.cuarto_lugar && userFinals.cuarto_lugar) {
+    if (normalize(userFinals.cuarto_lugar) === normalize(actualPodium.cuarto_lugar)) {
+      breakdown.cuarto_lugar = ptsConfig.cuarto_lugar;
+      breakdown.totalPoints += ptsConfig.cuarto_lugar;
+    }
+  }
+
+  return breakdown;
+}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getResults, getParticipants, getKnockoutMatches } from "@/lib/data";
 import { getAllMatches } from "@/lib/matches";
-import { getDetailedPoints, MatchResult } from "@/lib/scoring";
+import { getDetailedPoints, MatchResult, getActualPodium, getFinalsPoints } from "@/lib/scoring";
 
 export default function LeaderboardPage() {
   const [data, setData] = useState<any>(null);
@@ -44,9 +44,11 @@ export default function LeaderboardPage() {
   const participants = data.participants || [];
   const realResults = data.realResults || {};
 
+  const actualPodium = getActualPodium(matches, realResults);
+
   const processedParticipants = participants.map((p: any) => {
     const breakdown = {
-      exactColombia: 0, exactSouthAmerica: 0, exactRegular: 0, winnerResult: 0, totalPoints: 0
+      exactColombia: 0, exactSouthAmerica: 0, exactRegular: 0, winnerResult: 0, totalPoints: 0, finalsPoints: 0
     };
 
     Object.keys(realResults).forEach(matchId => {
@@ -67,6 +69,10 @@ export default function LeaderboardPage() {
         breakdown.totalPoints += points.totalPoints || 0;
       }
     });
+
+    const finalsPts = getFinalsPoints(p.finals || {}, actualPodium);
+    breakdown.finalsPoints = finalsPts.totalPoints;
+    breakdown.totalPoints += finalsPts.totalPoints;
 
     return { ...p, breakdown };
   });
@@ -108,6 +114,10 @@ export default function LeaderboardPage() {
                     <div className="flex items-center gap-1 bg-white/5 rounded-md px-2 py-0.5 border border-white/5">
                       <span className="text-white/60 text-[10px] font-black">{p.breakdown.winnerResult}</span>
                       <span className="text-[8px] font-black uppercase text-white/30">✓</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-white/5 rounded-md px-2 py-0.5 border border-white/5">
+                      <span className="text-yellow-500 text-[10px] font-black">{p.breakdown.finalsPoints}</span>
+                      <span className="text-[8px] font-black uppercase text-white/30">🏆</span>
                     </div>
                   </div>
                 </div>
